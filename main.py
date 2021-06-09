@@ -32,11 +32,20 @@ def extract_courses(login_page_html):
         courses.append(Course(course_num, short_name, name, total_assignments))
     return courses
 
+def get_login_soup(session):
+    response = session.post(f'{base_url}/login', params=get_post_parameters(session))
+    if not response:
+        # TODO better handling here; this could happen because the user is already logged in.
+        raise Exception('User may already be logged in.')
+    soup = BeautifulSoup(response.content, 'html.parser')
+    if soup.find('title').string  == 'Log In | Gradescope':
+        raise Exception('Failed to log in, or the user is already logged in. please check username and password.')
+        
+    return soup
+    
 def main():
     with requests.Session() as session:
-        login_resp = session.post(f'{base_url}/login', params=get_post_parameters(session))
-
-        soup = BeautifulSoup(login_resp.content, 'html.parser')
+        soup = get_login_soup(session)
         courses = extract_courses(soup)
         for course in courses:
             print(course)
