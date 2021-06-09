@@ -9,23 +9,8 @@ account_info_filename = 'data.json'
 
 def get_auth_token(session):
     init_response = session.get(base_url)
-    auth_token = ""
     parsed_init_resp = BeautifulSoup(init_response.text, 'html.parser')
-    #print(parsed_init_resp.find_all('form', {'action': '/login'}))
-
-    #print('big search: \n')
-    inp = parsed_init_resp.find('input', {'name': 'authenticity_token'})
-    #print(inp, '\n')
-    #print('small search:\n')
-    #for form in parsed_init_resp.find_all('form', {'action': '/login'}): # this method of finding the token is from https://github.com/apozharski/gradescope-api/blob/master/pyscope/pyscope.py
-        #if form.get("action") == "/login":
-        #for inp in form.find_all('input', {'name': 'authenticity_token'}):
-            #if inp.get('name') == "authenticity_token":
-            #print(inp, '\n')
-            #auth_token = inp.get('value')
-    
-    #print(f'{inp.get("value")=}\n{auth_token=}')
-    return inp.get("value") # TODO why can't I do get("value") properly?
+    return (parsed_init_resp.find('input', {'name': 'authenticity_token'})).get("value")
 
 def get_post_parameters(session):
     with open(account_info_filename, 'r') as account_file:
