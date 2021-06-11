@@ -1,30 +1,18 @@
 from util.course import Course
 from bs4 import BeautifulSoup
-import json
 from util.assignment import Assignment
 from datetime import datetime
 
 base_url = 'https://www.gradescope.com'
-account_info_filename = 'data.json'
 
 def get_auth_token(session):
     init_response = session.get(base_url)
     parsed_init_resp = BeautifulSoup(init_response.text, 'html.parser')
     return (parsed_init_resp.find('input', {'name': 'authenticity_token'})).get("value")
 
-def get_post_parameters(session):
-    with open(account_info_filename, 'r') as account_file: # TODO should be account info filepath
-        account_data = json.load(account_file)
-
-    return {
-        "session[email]": account_data['email'],
-        "session[password]": account_data['password'],
-        "authenticity_token": get_auth_token(session),
-    }
-
-def extract_courses(login_page_html):
+def extract_courses(dashboard_page_soup):
     courses = []
-    for tag in login_page_html.find_all('a', class_='courseBox'):
+    for tag in dashboard_page_soup.find_all('a', class_='courseBox'):
         course_num = tag.get('href').replace('/courses/', '')
         name = tag.find('h4', {'class': 'courseBox--name'}).string
         short_name = tag.find('h3', {'class': 'courseBox--shortname'}).string
@@ -32,12 +20,23 @@ def extract_courses(login_page_html):
         courses.append(Course(course_num, short_name, name, total_assignments))
     return courses
 
-def get_login_soup(session):
-    response = session.post(f'{base_url}/login', params=get_post_parameters(session)) or session.get(base_url)
+def get_login_soup(session, account_info_json):
+    
+    if not all(x in account_info_json for x in ['email', 'password']):
+        raise Exception('Insufficient account information provided.')
+    
+    post_params = {
+        "session[email]": account_info_json['email'],
+        "session[password]": account_info_json['password'],
+        "authenticity_token": get_auth_token(session),
+    }
+    
+    # Login and get the response, or access the base url if the user is already logged in.
+    response = session.post(f'{base_url}/login', params=post_params) or session.get(base_url)
     
     soup = BeautifulSoup(response.content, 'html.parser') # TODO switch to lxml parser
     if soup.find('title').string  == 'Log In | Gradescope':
-        raise Exception('Failed to log in, or the user is already logged in. please check username and password.')
+        raise Exception('Failed to log in. Please check username and password.')
         
     return soup
 

@@ -1,27 +1,22 @@
 import requests
-from util import course, extractor
+from util import extractor
 import pytest  # make sure to pip install pytest-dependency
 from bs4 import BeautifulSoup
-import datetime
 
 @pytest.mark.dependency(name='auth_token')
 def test_get_auth_token():
     with requests.session() as session:
         assert extractor.get_auth_token(session).strip() is not ''
 
-@pytest.mark.dependency(name='post_params', depends=['auth_token'])
-def test_get_post_parameters():
-    with requests.session() as session:
-        params = extractor.get_post_parameters(session)
-        for _, val in params.items():
-            assert val
-
-
-@pytest.mark.dependency(depends=['post_params', 'auth_token'])
+@pytest.mark.dependency(depends=['auth_token'])
 def test_get_login_soup():
+    bad_login_json = {
+        "username": "invalid",
+        "password": "wrong"
+    }
     with requests.session() as session:
-        assert extractor.get_login_soup(session)
-    # TODO test for when bad username/password combo is used
+        with pytest.raises(Exception):
+            extractor.get_login_soup(session, bad_login_json)
 
 
 def test_extract_courses():
