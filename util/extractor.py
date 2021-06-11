@@ -2,6 +2,7 @@ from util.course import Course
 from bs4 import BeautifulSoup
 import json
 from util.assignment import Assignment
+from datetime import datetime
 
 base_url = 'https://www.gradescope.com'
 account_info_filename = 'data.json'
@@ -51,9 +52,9 @@ def extract_assignment_from_row(row_soup):
     assignment_url = base_url + assignment_link_header.find('a')['href'].split('/submissions')[0] if assignment_link_header.find('a') else ''
 
     release_date = row_soup.find('span', {'class':'submissionTimeChart--releaseDate'}).contents
-    due_dates = [span.contents[0] for span in row_soup.find_all('span', {'class': 'submissionTimeChart--dueDate'})]
+    due_dates = [datetime.strptime(span.contents[0].split('Due Date: ')[-1], '%b %d at %I:%M%p') for span in row_soup.find_all('span', {'class': 'submissionTimeChart--dueDate'})]
     due_date = due_dates[0]
-    late_due_date = due_dates[1] if len(due_dates) == 2 else ''
+    late_due_date = due_dates[1] if len(due_dates) == 2 else None
     return Assignment(assignment_name, assignment_url, submitted, release_date, due_date, late_due_date)
 
 def get_course_assignments(session, course_num):

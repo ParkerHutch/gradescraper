@@ -4,9 +4,9 @@ class Assignment: # TODO courseName variable?
         self.name = name
         self.submitted = submitted
         self.url = ''
-        self.release_date = ''
-        self.due_date = ''
-        self.late_due_date = ''
+        self.release_date = None # TODO store this also
+        self.due_date = None
+        self.late_due_date = None
     
     def __init__(self, name, url, submitted, release_date, due_date, late_due_date):
         self.name = name

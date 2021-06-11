@@ -2,6 +2,7 @@ import requests
 from util import course, extractor
 import pytest  # make sure to pip install pytest-dependency
 from bs4 import BeautifulSoup
+import datetime
 
 @pytest.mark.dependency(name='auth_token')
 def test_get_auth_token():
@@ -59,6 +60,10 @@ def test_extract_submitted_assignment():
     extracted_assignment = extractor.extract_assignment_from_row(row_input_soup)
     assert extracted_assignment.name == 'Final Exam'
     assert extracted_assignment.submitted == True
+    assert extracted_assignment.due_date.month == 5
+    assert extracted_assignment.due_date.day == 10
+    assert extracted_assignment.due_date.hour == 23
+    assert extracted_assignment.due_date.minute == 59
 
 def test_extract_unsubmitted_assignment():
     row_input_html = """
@@ -85,6 +90,11 @@ def test_extract_unsubmitted_assignment():
     extracted_assignment = extractor.extract_assignment_from_row(row_input_soup)
     assert extracted_assignment.name == 'Incomplete Assignment'
     assert extracted_assignment.submitted == False
+    assert extracted_assignment.due_date.month == 3
+    assert extracted_assignment.due_date.day == 17
+    assert extracted_assignment.due_date.hour == 17
+    assert extracted_assignment.due_date.minute == 0
+
 
 def test_extract_scored_assignment():
     row_input_html = """
@@ -101,7 +111,7 @@ def test_extract_scored_assignment():
                         aria-label="Released at April 14"
                         class="submissionTimeChart--releaseDate">Apr 14</span><span
                         aria-label="Due at April 14 at  5:00PM"
-                        class="submissionTimeChart--dueDate">Apr 14 at 5:00PM</span>
+                        class="submissionTimeChart--dueDate">Apr 14 at 11:59PM</span>
                 </div>
             </div>
         </td>
@@ -111,3 +121,48 @@ def test_extract_scored_assignment():
     extracted_assignment = extractor.extract_assignment_from_row(row_input_soup)
     assert extracted_assignment.name == 'Scored Exam Example'
     assert extracted_assignment.submitted == True
+    assert extracted_assignment.due_date.month == 4
+    assert extracted_assignment.due_date.day == 14
+    assert extracted_assignment.due_date.hour == 23
+    assert extracted_assignment.due_date.minute == 59
+
+
+def test_extract_assignment_with_late_due_date():
+    row_input_html = """
+    <tr role="row" class="even">
+        <th class="table--primaryLink" role="rowheader" scope="row">Assignment with Late Due Date</th>
+        <td class="submissionStatus submissionStatus-warning">
+            <div aria-hidden="true" class="submissionStatus--bullet"
+                role="presentation"></div>
+            <div class="submissionStatus--text">No Submission</div>
+        </td>
+        <td class="sorting_1 sorting_2">
+            <div class="submissionTimeChart">
+                <div class="progressBar--caption"><span
+                        aria-label="Released at February 20"
+                        class="submissionTimeChart--releaseDate">Feb 20</span><span
+                        aria-label="Due at February 20 at  5:00PM"
+                        class="submissionTimeChart--dueDate">Feb 20 at
+                        5:00PM</span><br><span
+                        aria-label="Late Due Date at February 20 at  5:10PM"
+                        class="submissionTimeChart--dueDate">Late Due Date: Feb 20 at
+                        5:10PM</span></div>
+            </div>
+        </td>
+    </tr>
+    """
+    row_input_soup = BeautifulSoup(row_input_html, 'html.parser')
+    extracted_assignment = extractor.extract_assignment_from_row(row_input_soup)
+    assert extracted_assignment.name == 'Assignment with Late Due Date'
+    assert extracted_assignment.submitted == False
+    
+    assert extracted_assignment.due_date.month == 2
+    assert extracted_assignment.due_date.day == 20
+    assert extracted_assignment.due_date.hour == 17
+    assert extracted_assignment.due_date.minute == 0
+    
+    assert extracted_assignment.late_due_date.month == 2
+    assert extracted_assignment.late_due_date.day == 20
+    assert extracted_assignment.late_due_date.hour == 17
+    assert extracted_assignment.late_due_date.minute == 10
+
