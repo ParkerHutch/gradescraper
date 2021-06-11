@@ -1,0 +1,310 @@
+<html lang="en">
+
+<head>
+    <title>Example Course Title</title>
+    <meta name="csrf-param" content="authenticity_token">
+    <meta name="csrf-token" content="<authenticity_token_value_would_be_here>">
+    <meta name="pinterest" content="nopin">
+</head>
+
+<body data-action="show" data-controller="courses" class="js-focus-ring">
+    <nav class="l-sidebar">
+        <div class="sidebar--content">
+            
+            <h1 class="sidebar--title"><a href="/courses/123456">Course Title</a></h1>
+            <div class="sidebar--subtitle">Course Subtitle</div>
+            <ul class="sidebar--menu">
+                <li class="sidebar--menuItem"><a aria-label="Dashboard" href="/courses/123456" class="active">
+                        <div class="sidebar--menuItemIcon"><i aria_hidden="true" class="fa fa-tasks"></i></div>
+                        <div class="sidebar--menuItemLabel">Dashboard</div>
+                    </a></li>
+                <li class="sidebar--menuItem"><a aria-label="Regrade Requests" href="/courses/123456/regrade_requests">
+                        <div class="sidebar--menuItemIcon"><i aria_hidden="true" class="fa fa-repeat"></i></div>
+                        <div class="sidebar--menuItemLabel">Regrade Requests</div>
+                    </a></li>
+            </ul>
+            <h2 class="sidebar--menuHeader">Instructors</h2>
+            <ul class="sidebar--menu sidebar--menu-hiddenWhenCollapsed js-sidebarRoster">
+                <li class="sidebar--menuItem" id="sidebar-instructor-1931863">
+                    <div class="sidebar--menuItemIcon">
+                        <div class="fa-stack-container"><span class="fa-stack fa-lg"><i
+                                    class="fa fa-circle-thin fa-stack-2x"></i><i
+                                    class="fa fa-user fa-stack-1x"></i></span></div>
+                    </div>
+                    <div class="sidebar--menuItemLabel">Instructor 1 Name</div>
+                </li>
+                <li class="sidebar--menuItem" id="sidebar-instructor-2040879">
+                    <div class="sidebar--menuItemIcon">
+                        <div class="fa-stack-container"><span class="fa-stack fa-lg"><i
+                                    class="fa fa-circle-thin fa-stack-2x"></i><i
+                                    class="fa fa-user fa-stack-1x"></i></span></div>
+                    </div>
+                    <div class="sidebar--menuItemLabel">Instructor 2 Name</div>
+                </li>
+                <li class="sidebar--menuItem" id="sidebar-instructor-2044574">
+                    <div class="sidebar--menuItemIcon">
+                        <div class="fa-stack-container"><span class="fa-stack fa-lg"><i
+                                    class="fa fa-circle-thin fa-stack-2x"></i><i
+                                    class="fa fa-user fa-stack-1x"></i></span></div>
+                    </div>
+                    <div class="sidebar--menuItemLabel">Instructor 3 Name</div>
+                </li>
+                <li class="sidebar--menuItem" id="sidebar-instructor-2052131">
+                    <div class="sidebar--menuItemIcon">
+                        <div class="fa-stack-container"><span class="fa-stack fa-lg"><i
+                                    class="fa fa-circle-thin fa-stack-2x"></i><i
+                                    class="fa fa-user fa-stack-1x"></i></span></div>
+                    </div>
+                    <div class="sidebar--menuItemLabel">Instructor 4 Name</div>
+                </li>
+                <li class="sidebar--menuItem" id="sidebar-instructor-2687948">
+                    <div class="sidebar--menuItemIcon">
+                        <div class="fa-stack-container"><span class="fa-stack fa-lg"><i
+                                    class="fa fa-circle-thin fa-stack-2x"></i><i
+                                    class="fa fa-user fa-stack-1x"></i></span></div>
+                    </div>
+                    <div class="sidebar--menuItemLabel">Instructor 5 Name</div>
+                </li>
+            </ul>
+            <div class="sidebar--userProfileMenuMobile">
+                <h2 class="sidebar--menuHeader">More</h2><a class="sidebar--userProfileMenuMobileLink" target="_blank"
+                    rel="noopener" href="https://help.gradescope.com"><i aria-hidden="true"
+                        class="fa fa-question-circle"></i> Help</a><a class="sidebar--userProfileMenuMobileLink"
+                    href="/account/edit"><i aria-hidden="true" class="fa fa-user"></i> Edit Account</a><a
+                    class="sidebar--userProfileMenuMobileLink" href="/logout"><i aria-hidden="true"
+                        class="fa fa-power-off"></i> Log Out</a>
+            </div>
+        </div>
+        <div aria-label="toggle more options" class="sidebar--userProfile" tabindex="0" aria-haspopup="true"
+            aria-expanded="false" role="button">
+            <div aria-hidden="true" class="sidebar--userProfileIcon" role="presentation">
+                <div class="fa-stack-container"><span class="fa-stack fa-lg"><i aria-hidden="true"
+                            class="fa fa-circle-thin fa-stack-2x"></i><i aria-hidden="true"
+                            class="fa fa-user fa-stack-1x"></i></span></div>
+            </div>
+            <div class="sidebar--userProfileName">Account</div>
+            <div class="sidebar--userProfileMenuToggle"><i aria-label="toggle account menu" role="img"
+                    class="fa fa-angle-up"></i></div>
+        </div>
+        <div class="modal modal-helpCenter js-helpCenterModal">
+            <div class="js-helpCenter" data-url="/help/contents"></div>
+        </div>
+    </nav>
+    <nav class="l-mobileTopNav">
+        <div aria-expanded="false" aria-label="expand sidebar"
+            class="collapseIcon js-toggleSidebarMobile collapseIcon-is-collapsed js-interactiveElement" role="button"
+            tabindex="0"><i aria-hidden="true" class="fa fa-chevron-left collapseIcon--leftArrow"></i><i
+                aria-hidden="true" class="fa fa-bars collapseIcon--hamburger"></i><i aria-hidden="true"
+                class="fa fa-chevron-right collapseIcon--rightArrow"></i></div>
+        <div class="logo"><a aria-label="back to home" href="/"><svg xmlns="http://www.w3.org/2000/svg" width="29"
+                    height="26" viewBox="0 0 29 26" aria-hidden="true">
+                    <g fill-rule="evenodd">
+                    </g>
+                </svg>
+                <div class="logo--text">gradescope</div>
+            </a></div>
+    </nav>
+    <div class="l-mainWrapper">
+        <div class="sidebar--mobileOverlay"></div>
+        <main class="l-main" id="main-content" tabindex="-1">
+            <div class="l-header"></div>
+            <div class="l-contentWrapper">
+                <div class="l-content">
+                    <header class="courseHeader">
+                        <h1 class="courseHeader--title">Course Title</h1>
+                        <div class="courseHeader--term">Spring 1776</div>
+                    </header>
+                    <section>
+                        <div id="assignments-student-table_wrapper" class="dataTables_wrapper no-footer">
+                            <table class="table dataTable no-footer" id="assignments-student-table"
+                                style="width: 968px;">
+                                <caption class="sr-only">Assignments List</caption>
+                                <thead>
+                                    <tr role="row">
+                                        <th role="columnheader" scope="col" class="sorting" tabindex="0"
+                                            aria-controls="assignments-student-table" rowspan="1" colspan="1"
+                                            aria-label="Name" style="width: 328px;">Name</th>
+                                        <th role="columnheader" scope="col" class="sorting" tabindex="0"
+                                            aria-controls="assignments-student-table" rowspan="1" colspan="1"
+                                            aria-label="Status" style="width: 198px;">Status</th>
+                                        <th class="table--complexHeader sorting-right sorting_desc" role="columnheader"
+                                            scope="col" tabindex="0" aria-controls="assignments-student-table"
+                                            rowspan="1" colspan="1" aria-label="ReleasedDue (EDT)"
+                                            style="width: 410px;">
+                                            <div aria-label="Due Date"><span aria-hidden="true"
+                                                    class="table--cell-hiddenOnMobile">Released</span><span>Due (<abbr
+                                                        title="Eastern Time (US &amp; Canada)">EDT</abbr>)</span></div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr role="row" class="odd">
+                                        <th class="table--primaryLink" role="rowheader" scope="row"><a
+                                                aria-label="View Final Exam"
+                                                href="/courses/123456/assignments/1230900/submissions/12345678">Final
+                                                Exam</a></th>
+                                        <td class="submissionStatus submissionStatus-complete">
+                                            <div aria-hidden="true" class="submissionStatus--bullet"
+                                                role="presentation"></div>
+                                            <div class="submissionStatus--text">Submitted</div>
+                                        </td>
+                                        <td class="sorting_1 sorting_2">
+                                            <div class="submissionTimeChart">
+                                                <div class="progressBar--caption"><span aria-label="Released at May 10"
+                                                        class="submissionTimeChart--releaseDate">May 10</span><span
+                                                        aria-label="Due at May 10 at 11:59PM"
+                                                        class="submissionTimeChart--dueDate">May 10 at 11:59PM</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr role="row" class="even">
+                                        <th class="table--primaryLink" role="rowheader" scope="row"><a
+                                                aria-label="View Exam 3"
+                                                href="/courses/123456/assignments/1172058/submissions/12345678">Exam
+                                                3</a></th>
+                                        <td class="submissionStatus">
+                                            <div class="submissionStatus--score">38.5 / 40.0</div>
+                                        </td>
+                                        <td class="sorting_1 sorting_2">
+                                            <div class="submissionTimeChart">
+                                                <div class="progressBar--caption"><span
+                                                        aria-label="Released at April 14"
+                                                        class="submissionTimeChart--releaseDate">Apr 14</span><span
+                                                        aria-label="Due at April 14 at  5:00PM"
+                                                        class="submissionTimeChart--dueDate">Apr 14 at 5:00PM</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr role="row" class="odd">
+                                        <th class="table--primaryLink" role="rowheader" scope="row"><a
+                                                aria-label="View Exam2 section 001 Dizaji"
+                                                href="/courses/123456/assignments/1109579/submissions/12345678">Another
+                                                Assignment</a></th>
+                                        <td class="submissionStatus">
+                                            <div class="submissionStatus--score">34.0 / 35.0</div>
+                                        </td>
+                                        <td class="sorting_1 sorting_2">
+                                            <div class="submissionTimeChart">
+                                                <div class="progressBar--caption"><span
+                                                        aria-label="Released at March 19"
+                                                        class="submissionTimeChart--releaseDate">Mar 19</span><span
+                                                        aria-label="Due at March 19 at  5:00PM"
+                                                        class="submissionTimeChart--dueDate">Mar 19 at 5:00PM</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr role="row" class="even">
+                                        <th class="table--primaryLink" role="rowheader" scope="row">Example of
+                                            assignment not yet submitted</th>
+                                        <td class="submissionStatus submissionStatus-warning">
+                                            <div aria-hidden="true" class="submissionStatus--bullet"
+                                                role="presentation"></div>
+                                            <div class="submissionStatus--text">No Submission</div>
+                                        </td>
+                                        <td class="sorting_1 sorting_2">
+                                            <div class="submissionTimeChart">
+                                                <div class="progressBar--caption"><span
+                                                        aria-label="Released at March 17"
+                                                        class="submissionTimeChart--releaseDate">Mar 17</span><span
+                                                        aria-label="Due at March 17 at  5:00PM"
+                                                        class="submissionTimeChart--dueDate">Mar 17 at 5:00PM</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr role="row" class="odd">
+                                        <th class="table--primaryLink" role="rowheader" scope="row">Another assignment
+                                            not submitted</th>
+                                        <td class="submissionStatus submissionStatus-warning">
+                                            <div aria-hidden="true" class="submissionStatus--bullet"
+                                                role="presentation"></div>
+                                            <div class="submissionStatus--text">No Submission</div>
+                                        </td>
+                                        <td class="sorting_1 sorting_2">
+                                            <div class="submissionTimeChart">
+                                                <div class="progressBar--caption"><span
+                                                        aria-label="Released at February 22"
+                                                        class="submissionTimeChart--releaseDate">Feb 22</span><span
+                                                        aria-label="Due at February 22 at  5:00PM"
+                                                        class="submissionTimeChart--dueDate">Feb 22 at
+                                                        5:00PM</span><br><span
+                                                        aria-label="Late Due Date at February 22 at  5:10PM"
+                                                        class="submissionTimeChart--dueDate">Late Due Date: Feb 22 at
+                                                        5:10PM</span></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr role="row" class="even">
+                                        <th class="table--primaryLink" role="rowheader" scope="row">Assignment with Late
+                                            Due Date</th>
+                                        <td class="submissionStatus submissionStatus-warning">
+                                            <div aria-hidden="true" class="submissionStatus--bullet"
+                                                role="presentation"></div>
+                                            <div class="submissionStatus--text">No Submission</div>
+                                        </td>
+                                        <td class="sorting_1 sorting_2">
+                                            <div class="submissionTimeChart">
+                                                <div class="progressBar--caption"><span
+                                                        aria-label="Released at February 20"
+                                                        class="submissionTimeChart--releaseDate">Feb 20</span><span
+                                                        aria-label="Due at February 20 at  5:00PM"
+                                                        class="submissionTimeChart--dueDate">Feb 20 at
+                                                        5:00PM</span><br><span
+                                                        aria-label="Late Due Date at February 20 at  5:10PM"
+                                                        class="submissionTimeChart--dueDate">Late Due Date: Feb 20 at
+                                                        5:10PM</span></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr role="row" class="odd">
+                                        <th class="table--primaryLink" role="rowheader" scope="row"><a
+                                                aria-label="View Exam 1"
+                                                href="/courses/123456/assignments/1031641/submissions/12345678">Exam
+                                                1</a></th>
+                                        <td class="submissionStatus">
+                                            <div class="submissionStatus--score">29.0 / 30.0</div>
+                                        </td>
+                                        <td class="sorting_1 sorting_2">
+                                            <div class="submissionTimeChart">
+                                                <div class="progressBar--caption"><span
+                                                        aria-label="Released at February 19"
+                                                        class="submissionTimeChart--releaseDate">Feb 19</span><span
+                                                        aria-label="Due at February 19 at  5:00PM"
+                                                        class="submissionTimeChart--dueDate">Feb 19 at
+                                                        5:00PM</span><br><span
+                                                        aria-label="Late Due Date at February 19 at  5:10PM"
+                                                        class="submissionTimeChart--dueDate">Late Due Date: Feb 19 at
+                                                        5:10PM</span></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                </div>
+            </div>
+        </main>
+    </div>
+    <div id="jBox1" class="jBox-wrapper jBox-Tooltip jBox-Default jBox-wrapper-popover jBox-pointerPosition-bottom"
+        style="position: absolute; display: none; opacity: 0; z-index: 10000; padding-bottom: 12px;">
+        <div class="jBox-container">
+            <div class="jBox-content" aria-hidden="true" role="tooltip">
+                <div class="sidebar--userProfileMenu" data-jbox-content-appended="1" style="display: block;"><a
+                        class="popover--listItem popover--listItem-userProfileMenu" target="_blank" rel="noopener"
+                        href="https://help.gradescope.com"><i aria-hidden="true" class="fa fa-question-circle"></i>
+                        Help</a><a class="popover--listItem popover--listItem-userProfileMenu" href="/account/edit"><i
+                            aria-hidden="true" class="fa fa-user"></i> Edit Account</a><a
+                        class="popover--listItem popover--listItem-userProfileMenu" href="/logout"><i aria-hidden="true"
+                            class="fa fa-power-off"></i> Log Out</a></div>
+            </div>
+        </div>
+        <div class="jBox-pointer jBox-pointer-bottom" style="left: 0px; margin-left: 20px; height: 13px;"></div>
+    </div>
+</body>
+
+</html>
