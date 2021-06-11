@@ -21,10 +21,6 @@ def test_get_post_parameters():
 def test_get_login_soup():
     with requests.session() as session:
         assert extractor.get_login_soup(session)
-        # Exception expected if user already logged in.
-        with pytest.raises(Exception):
-            # TODO maybe soup should just be empty if the user is already logged in
-            extractor.get_login_soup(session)
     # TODO test for when bad username/password combo is used
 
 

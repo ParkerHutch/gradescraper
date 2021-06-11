@@ -11,6 +11,7 @@ from util import extractor
 def main():
     with requests.Session() as session:
         login_soup = extractor.get_login_soup(session)
+        login_soup = extractor.get_login_soup(session)
         courses = extractor.extract_courses(login_soup)
         for course in courses:
             course.assignments = extractor.get_course_assignments(session, course.course_num)

@@ -33,10 +33,8 @@ def extract_courses(login_page_html):
     return courses
 
 def get_login_soup(session):
-    response = session.post(f'{base_url}/login', params=get_post_parameters(session))
-    if not response:
-        # TODO better handling here; this could happen because the user is already logged in.
-        raise Exception('User may already be logged in.') # TODO if user is already logged in, return /get base url
+    response = session.post(f'{base_url}/login', params=get_post_parameters(session)) or session.get(base_url)
+    
     soup = BeautifulSoup(response.content, 'html.parser') # TODO switch to lxml parser
     if soup.find('title').string  == 'Log In | Gradescope':
         raise Exception('Failed to log in, or the user is already logged in. please check username and password.')
