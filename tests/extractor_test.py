@@ -21,7 +21,7 @@ def test_get_login_soup():
 
 def test_extract_courses():
     with open('tests/courses_dashboard.html', 'r') as courses_html:
-        soup = BeautifulSoup(courses_html, 'html.parser')
+        soup = BeautifulSoup(courses_html, 'lxml')
         assert extractor.extract_courses(soup)
 
 def test_extract_submitted_assignment():
@@ -47,7 +47,7 @@ def test_extract_submitted_assignment():
         </td>
     </tr>
     """
-    row_input_soup = BeautifulSoup(row_input_html, 'html.parser')
+    row_input_soup = BeautifulSoup(row_input_html, 'lxml')
     extracted_assignment = extractor.extract_assignment_from_row(row_input_soup)
     assert extracted_assignment.name == 'Final Exam'
     assert extracted_assignment.submitted == True
@@ -77,7 +77,7 @@ def test_extract_unsubmitted_assignment():
         </td>
     </tr>
     """
-    row_input_soup = BeautifulSoup(row_input_html, 'html.parser')
+    row_input_soup = BeautifulSoup(row_input_html, 'lxml')
     extracted_assignment = extractor.extract_assignment_from_row(row_input_soup)
     assert extracted_assignment.name == 'Incomplete Assignment'
     assert extracted_assignment.submitted == False
@@ -108,7 +108,7 @@ def test_extract_scored_assignment():
         </td>
     </tr>
     """
-    row_input_soup = BeautifulSoup(row_input_html, 'html.parser')
+    row_input_soup = BeautifulSoup(row_input_html, 'lxml')
     extracted_assignment = extractor.extract_assignment_from_row(row_input_soup)
     assert extracted_assignment.name == 'Scored Exam Example'
     assert extracted_assignment.submitted == True
@@ -142,7 +142,7 @@ def test_extract_assignment_with_late_due_date():
         </td>
     </tr>
     """
-    row_input_soup = BeautifulSoup(row_input_html, 'html.parser')
+    row_input_soup = BeautifulSoup(row_input_html, 'lxml')
     extracted_assignment = extractor.extract_assignment_from_row(row_input_soup)
     assert extracted_assignment.name == 'Assignment with Late Due Date'
     assert extracted_assignment.submitted == False

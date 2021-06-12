@@ -1,17 +1,18 @@
 from util.course import Course
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, SoupStrainer
 from util.assignment import Assignment
 from datetime import datetime
-
+import time
 base_url = 'https://www.gradescope.com'
 
 def get_auth_token(session):
-    init_response = session.get(base_url)
-    parsed_init_resp = BeautifulSoup(init_response.text, 'html.parser')
+    parsed_init_resp = BeautifulSoup(session.get(base_url).text, 'lxml', parse_only=SoupStrainer("input"))
     return (parsed_init_resp.find('input', {'name': 'authenticity_token'})).get("value")
 
 def extract_courses(dashboard_page_soup):
-    courses = []
+    # TODO extract the term and store that in the course also
+    # (search for divs with class courselist, every term has an h2 with the term name before its list of courses)
+    courses = [] 
     for tag in dashboard_page_soup.find_all('a', class_='courseBox'):
         course_num = tag.get('href').replace('/courses/', '')
         name = tag.find('h4', {'class': 'courseBox--name'}).string
@@ -34,19 +35,19 @@ def get_login_soup(session, account_info_json):
     # Login and get the response, or access the base url if the user is already logged in.
     response = session.post(f'{base_url}/login', params=post_params) or session.get(base_url)
     
-    soup = BeautifulSoup(response.content, 'html.parser') # TODO switch to lxml parser
+    soup = BeautifulSoup(response.content, 'lxml')
     if soup.find('title').string  == 'Log In | Gradescope':
         raise Exception('Failed to log in. Please check username and password.')
         
     return soup
 
 def extract_assignment_from_row(row_soup):
-    submitted = not 'submissionStatus-warning' in row_soup.select('td[class*="submissionStatus"]')[0].get('class')
-
+    submitted = not row_soup.find('td', {'class': 'submissionStatus submissionStatus-warning'})
     assignment_link_header = row_soup.find('th', {'class': 'table--primaryLink'})
-    assignment_name = (assignment_link_header.find('a') or assignment_link_header).contents[0]
+    assignment_link_element = assignment_link_header.find('a')
+    assignment_name = (assignment_link_element or assignment_link_header).contents[0]
 
-    assignment_url = base_url + assignment_link_header.find('a')['href'].split('/submissions')[0] if assignment_link_header.find('a') else ''
+    assignment_url = base_url + assignment_link_element['href'].split('/submissions')[0] if assignment_link_element else ''
 
     release_date = row_soup.find('span', {'class':'submissionTimeChart--releaseDate'}).contents
     due_dates = [datetime.strptime(span.contents[0].split('Due Date: ')[-1], '%b %d at %I:%M%p') for span in row_soup.find_all('span', {'class': 'submissionTimeChart--dueDate'})]
@@ -56,8 +57,7 @@ def extract_assignment_from_row(row_soup):
 
 def get_course_assignments(session, course_num):
     course_page_response = session.get(f'{base_url}/courses/{course_num}')
-    soup = BeautifulSoup(course_page_response.content, 'html.parser')
-    assignments_table = soup.find('table', {'id': 'assignments-student-table'}).find('tbody')
     
-    assignments = [extract_assignment_from_row(row) for row in assignments_table]
-    return assignments
+    assignments_soup = BeautifulSoup(course_page_response.content, 'lxml', parse_only=SoupStrainer('tr')).find_all('tr')[1:]
+    
+    return [extract_assignment_from_row(row) for row in assignments_soup]
