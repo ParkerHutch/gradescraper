@@ -31,6 +31,7 @@ def main():
             # TODO this is a good candidate for multithreading:
             # make a thread for each course assignments request
             course.assignments = extractor.get_course_assignments(session, course.course_num)
+            print(course)
         
 if __name__ == '__main__':
     main()

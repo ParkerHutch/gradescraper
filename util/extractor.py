@@ -1,3 +1,4 @@
+from util import course
 from util.course import Course
 from bs4 import BeautifulSoup, SoupStrainer
 from util.assignment import Assignment
@@ -10,15 +11,20 @@ def get_auth_token(session):
     return (parsed_init_resp.find('input', {'name': 'authenticity_token'})).get("value")
 
 def extract_courses(dashboard_page_soup):
-    # TODO extract the term and store that in the course also
-    # (search for divs with class courselist, every term has an h2 with the term name before its list of courses)
     courses = [] 
-    for tag in dashboard_page_soup.find_all('a', class_='courseBox'):
-        course_num = tag.get('href').replace('/courses/', '')
-        name = tag.find('h4', {'class': 'courseBox--name'}).string
-        short_name = tag.find('h3', {'class': 'courseBox--shortname'}).string
-        total_assignments = int(tag.find('div', {'class': 'courseBox--assignments'}).string.split(' ')[0])
-        courses.append(Course(course_num, short_name, name, total_assignments))
+    course_list_div_children = list(dashboard_page_soup.find('div', {'class': 'courseList'}).children)
+    
+    for i in [x for x in range(len(course_list_div_children) - 1) if x % 2 == 0]:
+        print(f'{i=}')
+        term = course_list_div_children[i].string
+        term_courses_div = course_list_div_children[i+1]
+        for tag in term_courses_div.find_all('a', class_='courseBox'):
+            course_num = tag.get('href').replace('/courses/', '')
+            name = tag.find('h4', {'class': 'courseBox--name'}).string
+            short_name = tag.find('h3', {'class': 'courseBox--shortname'}).string
+            total_assignments = int(tag.find('div', {'class': 'courseBox--assignments'}).string.split(' ')[0])
+            courses.append(Course(term, course_num, short_name, name, total_assignments))
+        
     return courses
 
 def get_login_soup(session, account_info_json):
@@ -45,11 +51,12 @@ def extract_assignment_from_row(row_soup):
     submitted = not row_soup.find('td', {'class': 'submissionStatus submissionStatus-warning'})
     assignment_link_header = row_soup.find('th', {'class': 'table--primaryLink'})
     assignment_link_element = assignment_link_header.find('a')
-    assignment_name = (assignment_link_element or assignment_link_header).contents[0]
+    assignment_name = (assignment_link_element or assignment_link_header).contents[0] # TODO .string instead of .contents[0]?
 
     assignment_url = base_url + assignment_link_element['href'].split('/submissions')[0] if assignment_link_element else ''
 
     release_date = row_soup.find('span', {'class':'submissionTimeChart--releaseDate'}).contents
+    # TODO use span.string below instead of span.contents[0]?
     due_dates = [datetime.strptime(span.contents[0].split('Due Date: ')[-1], '%b %d at %I:%M%p') for span in row_soup.find_all('span', {'class': 'submissionTimeChart--dueDate'})]
     due_date = due_dates[0]
     late_due_date = due_dates[1] if len(due_dates) == 2 else None
