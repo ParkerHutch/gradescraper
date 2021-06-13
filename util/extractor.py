@@ -4,6 +4,9 @@ from bs4 import BeautifulSoup, SoupStrainer
 from util.assignment import Assignment
 from datetime import datetime
 import time
+import asyncio
+import aiohttp
+
 base_url = 'https://www.gradescope.com'
 
 def get_auth_token(session):
@@ -15,7 +18,6 @@ def extract_courses(dashboard_page_soup):
     course_list_div_children = list(dashboard_page_soup.find('div', {'class': 'courseList'}).children)
     
     for i in [x for x in range(len(course_list_div_children) - 1) if x % 2 == 0]:
-        print(f'{i=}')
         term = course_list_div_children[i].string
         term_courses_div = course_list_div_children[i+1]
         for tag in term_courses_div.find_all('a', class_='courseBox'):
@@ -68,3 +70,31 @@ def get_course_assignments(session, course_num):
     assignments_soup = BeautifulSoup(course_page_response.content, 'lxml', parse_only=SoupStrainer('tr')).find_all('tr')[1:]
     
     return [extract_assignment_from_row(row) for row in assignments_soup]
+
+
+async def async_get_auth_token(url, session):
+    response = await session.get(url)
+    response_text = await response.text()
+    parsed_init_resp = BeautifulSoup(response_text, 'lxml', parse_only=SoupStrainer("input"))
+    return (parsed_init_resp.find('input', {'name': 'authenticity_token'})).get("value")
+    
+
+async def async_get_login_soup(session, account_info_json):
+    
+    if not all(x in account_info_json for x in ['email', 'password']):
+        raise Exception('Insufficient account information provided.')
+    
+    post_params = {
+        "session[email]": account_info_json['email'],
+        "session[password]": account_info_json['password'],
+        "authenticity_token": await async_get_auth_token(base_url, session),
+    }
+    
+    # Login and get the response, or access the base url if the user is already logged in.
+    response = await session.post(f'{base_url}/login', params=post_params) or await session.get(base_url)
+    
+    soup = BeautifulSoup(await response.text(), 'lxml')
+    if soup.find('title').string  == 'Log In | Gradescope':
+        raise Exception('Failed to log in. Please check username and password.')
+        
+    return soup

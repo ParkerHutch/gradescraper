@@ -31,7 +31,11 @@ def main():
             # TODO this is a good candidate for multithreading:
             # make a thread for each course assignments request
             course.assignments = extractor.get_course_assignments(session, course.course_num)
-            print(course)
+        #print(f'Assignments time: {time_end - time_start}')
         
 if __name__ == '__main__':
+    time_start = time.time()
     main()
+    time_end = time.time()
+    print(f'Total time: {time_end - time_start}')
+
