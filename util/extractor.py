@@ -9,11 +9,13 @@ import aiohttp
 
 base_url = 'https://www.gradescope.com'
 
+
 def get_auth_token(session):
     parsed_init_resp = BeautifulSoup(session.get(base_url).text, 'lxml', parse_only=SoupStrainer("input"))
     return (parsed_init_resp.find('input', {'name': 'authenticity_token'})).get("value")
 
-def extract_courses(dashboard_page_soup):
+
+def extract_courses(dashboard_page_soup): # TODO try to make this async, or make the individual course extraction async
     courses = [] 
     course_list_div_children = list(dashboard_page_soup.find('div', {'class': 'courseList'}).children)
     
@@ -31,7 +33,7 @@ def extract_courses(dashboard_page_soup):
 
 def get_login_soup(session, account_info_json):
     
-    if not all(x in account_info_json for x in ['email', 'password']):
+    if not all(x in account_info_json for x in ['email', 'password']): # TODO try turning this into just two boolean conditions rather than a search
         raise Exception('Insufficient account information provided.')
     
     post_params = {
@@ -74,6 +76,7 @@ def get_course_assignments(session, course_num):
 
 async def async_get_auth_token(url, session):
     response = await session.get(url)
+    # TODO use response.raise_for_status() ?
     response_text = await response.text()
     parsed_init_resp = BeautifulSoup(response_text, 'lxml', parse_only=SoupStrainer("input"))
     return (parsed_init_resp.find('input', {'name': 'authenticity_token'})).get("value")
@@ -98,3 +101,10 @@ async def async_get_login_soup(session, account_info_json):
         raise Exception('Failed to log in. Please check username and password.')
         
     return soup
+
+async def async_retrieve_course_assignments(session, course):
+    course_page_response = await session.get(f'{base_url}/courses/{course.course_num}')
+    
+    assignments_soup = BeautifulSoup(await course_page_response.text(), 'lxml', parse_only=SoupStrainer('tr')).find_all('tr')[1:]
+    
+    course.assignments = [extract_assignment_from_row(row) for row in assignments_soup] # TODO maybe async here

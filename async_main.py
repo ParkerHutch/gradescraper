@@ -3,56 +3,33 @@ import asyncio
 import aiohttp
 import time
 import json
-from bs4 import BeautifulSoup, SoupStrainer
+
 import platform
+from functools import wraps
+from asyncio.proactor_events import _ProactorBasePipeTransport
 
 base_url = 'https://www.gradescope.com'
 
-
-async def get(url):
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url=url) as response:
-                resp = await response.read()
-                print("Successfully got url {} with response of length {}.".format(url, len(resp)))
-    except Exception as e:
-        print("Unable to get url {} due to {}.".format(url, e.__class__))
-
-
-async def main(urls, amount):
-    ret = await asyncio.gather(*[get(url) for url in urls])
-    print("Finalized all. ret is a list of len {} outputs.".format(len(ret)))
-
-
-async def async_retrieve_course_assignments(session, course):
-    course_page_response = await session.get(f'{base_url}/courses/{course.course_num}')
-    
-    assignments_soup = BeautifulSoup(await course_page_response.text(), 'lxml', parse_only=SoupStrainer('tr')).find_all('tr')[1:]
-    
-    course.assignments = [extractor.extract_assignment_from_row(row) for row in assignments_soup] # TODO maybe async here
-
-
 async def custom_main():
-    # Log in on the session
-    base_url = 'https://www.gradescope.com'
-
-    loop = asyncio.new_event_loop()
+    """
+    TODO
+    - see if async for would be useful anywhere
+    """
     async with aiohttp.ClientSession() as session:
         with open('data.json', 'r') as account_file:
-            account_json = json.load(account_file)
+            soup = await extractor.async_get_login_soup(session, json.load(account_file))
+            courses = extractor.extract_courses(soup) # TODO can I make this a generator, so that once a course is identified its async assignments function is immediately called
             
-            soup = await extractor.async_get_login_soup(session, account_json)
-            courses = extractor.extract_courses(soup)
-            
-            await asyncio.gather(*[async_retrieve_course_assignments(session, course) for course in courses])
+            """
+            TODO remove unecessary async methods (the ones I made for CPU-bound functions)
+            TODO I can refactor this to be align better with OOP principles
+            for course in courses:
+                course.assignments = async_get_assignments(course.course_num)
+            """
+            # TODO also test what happens when I don't use await below, I don't think it's necessary
+            await asyncio.gather(*[extractor.async_retrieve_course_assignments(session, course) for course in courses])
         
-    loop.close()
-            
         
-from functools import wraps
-
-from asyncio.proactor_events import _ProactorBasePipeTransport
-
 """
 The below 'dirty' fix silences a weird RunTime Error raised when the ProactorBasePipeTransport
 class is used to close the event loop on Windows.
@@ -76,5 +53,6 @@ if __name__ == '__main__':
         _ProactorBasePipeTransport.__del__ = silence_event_loop_closed(_ProactorBasePipeTransport.__del__)
     
     asyncio.run(custom_main())
-    print(f'all done: {time.time() - time_start}')
+    time_end = time.time()
+    print(f'Asynchronous execution: {time_end - time_start}')
 
