@@ -49,13 +49,14 @@ def test_extract_submitted_assignment():
     </tr>
     """
     row_input_soup = BeautifulSoup(row_input_html, 'lxml')
-    extracted_assignment = extractor.extract_assignment_from_row(row_input_soup)
+    extracted_assignment = extractor.extract_assignment_from_row(row_input_soup, 2021)
     assert extracted_assignment.name == 'Final Exam'
     assert extracted_assignment.submitted == True
     assert extracted_assignment.due_date.month == 5
     assert extracted_assignment.due_date.day == 10
     assert extracted_assignment.due_date.hour == 23
     assert extracted_assignment.due_date.minute == 59
+    assert extracted_assignment.due_date.year == 2021
 
 def test_extract_unsubmitted_assignment():
     row_input_html = """
@@ -79,13 +80,14 @@ def test_extract_unsubmitted_assignment():
     </tr>
     """
     row_input_soup = BeautifulSoup(row_input_html, 'lxml')
-    extracted_assignment = extractor.extract_assignment_from_row(row_input_soup)
+    extracted_assignment = extractor.extract_assignment_from_row(row_input_soup, 2021)
     assert extracted_assignment.name == 'Incomplete Assignment'
     assert extracted_assignment.submitted == False
     assert extracted_assignment.due_date.month == 3
     assert extracted_assignment.due_date.day == 17
     assert extracted_assignment.due_date.hour == 17
     assert extracted_assignment.due_date.minute == 0
+    assert extracted_assignment.due_date.year == 2021
 
 
 def test_extract_scored_assignment():
@@ -110,13 +112,14 @@ def test_extract_scored_assignment():
     </tr>
     """
     row_input_soup = BeautifulSoup(row_input_html, 'lxml')
-    extracted_assignment = extractor.extract_assignment_from_row(row_input_soup)
+    extracted_assignment = extractor.extract_assignment_from_row(row_input_soup, 2021)
     assert extracted_assignment.name == 'Scored Exam Example'
     assert extracted_assignment.submitted == True
     assert extracted_assignment.due_date.month == 4
     assert extracted_assignment.due_date.day == 14
     assert extracted_assignment.due_date.hour == 23
     assert extracted_assignment.due_date.minute == 59
+    assert extracted_assignment.due_date.year == 2021
 
 
 def test_extract_assignment_with_late_due_date():
@@ -144,7 +147,7 @@ def test_extract_assignment_with_late_due_date():
     </tr>
     """
     row_input_soup = BeautifulSoup(row_input_html, 'lxml')
-    extracted_assignment = extractor.extract_assignment_from_row(row_input_soup)
+    extracted_assignment = extractor.extract_assignment_from_row(row_input_soup, 2021)
     assert extracted_assignment.name == 'Assignment with Late Due Date'
     assert extracted_assignment.submitted == False
     
@@ -152,9 +155,13 @@ def test_extract_assignment_with_late_due_date():
     assert extracted_assignment.due_date.day == 20
     assert extracted_assignment.due_date.hour == 17
     assert extracted_assignment.due_date.minute == 0
+    assert extracted_assignment.due_date.year == 2021
+
     
     assert extracted_assignment.late_due_date.month == 2
     assert extracted_assignment.late_due_date.day == 20
     assert extracted_assignment.late_due_date.hour == 17
     assert extracted_assignment.late_due_date.minute == 10
+    assert extracted_assignment.late_due_date.year == 2021
+
 

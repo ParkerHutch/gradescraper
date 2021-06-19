@@ -19,6 +19,8 @@ async def main():
             - Assignment years are all set to 1900, fix this
             - async_get_auth_token takes most of the program time, see if there's a way to speed it up
             - Add something to documentation about how cchardet supposedly speeds up encoding
+            - Make a requirements.txt
+            - More error handling
     """
     async with aiohttp.ClientSession(raise_for_status=True) as session:
         with open('data.json', 'r') as account_file:
@@ -26,14 +28,9 @@ async def main():
 
             courses = extractor.extract_courses(soup)
             
-            recent_courses = extractor.strip_old_courses(courses)
-
-            """
-            TODO refactor this to be align better with OOP principles, ex:
-            for course in courses:
-                course.assignments = async_get_assignments(course.course_num)
-            """
-            await asyncio.gather(*[extractor.async_retrieve_course_assignments(session, course) for course in recent_courses])
+            await extractor.retrieve_assignments_for_courses(session, courses, recent_only=True)
+            
+            #await asyncio.gather(*[extractor.async_retrieve_course_assignments(session, course) for course in recent_courses])
 
         
 """

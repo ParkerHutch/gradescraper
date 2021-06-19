@@ -8,7 +8,7 @@ class Term:
         self.year = 0
         self.season = ''
 
-    def __init__(self, season, year) -> None:
+    def __init__(self, season: str, year: int):
         self.season = season
         self.year = year
     
