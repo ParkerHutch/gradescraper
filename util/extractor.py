@@ -79,7 +79,7 @@ def get_login_soup(session: aiohttp.ClientSession, account_info_json):
     return soup
 
 
-def extract_assignment_from_row(row_soup, assignment_year):
+def extract_assignment_from_row(row_soup, course_name, assignment_year):
     submitted = not row_soup.find(
         'td', {'class': 'submissionStatus submissionStatus-warning'}
     )
@@ -113,6 +113,7 @@ def extract_assignment_from_row(row_soup, assignment_year):
     late_due_date = due_dates[1] if len(due_dates) == 2 else None
     return Assignment(
         assignment_name,
+        course_name,
         assignment_url,
         submitted,
         release_date,
@@ -122,7 +123,7 @@ def extract_assignment_from_row(row_soup, assignment_year):
 
 
 def get_course_assignments(
-    session: aiohttp.ClientSession, course_num: int, course_year: int
+    session: aiohttp.ClientSession, course_name: str, course_num: int, course_year: int
 ):
     course_page_response = session.get(f'{base_url}/courses/{course_num}')
 
@@ -131,7 +132,7 @@ def get_course_assignments(
     ).find_all('tr')[1:]
 
     return [
-        extract_assignment_from_row(row, course_year)
+        extract_assignment_from_row(row, course_name, course_year)
         for row in assignments_soup
     ]
 
@@ -187,7 +188,7 @@ async def async_retrieve_course_assignments(
         parse_only=SoupStrainer('tr'),
     ).find_all('tr')[1:]
     course.assignments = [
-        extract_assignment_from_row(row, course.term.year)
+        extract_assignment_from_row(row, course.name, course.term.year)
         for row in assignments_soup
     ]
 
@@ -201,7 +202,7 @@ def strip_old_courses(courses_list: List[Course]) -> List[Course]:
 
 
 async def retrieve_assignments_for_courses(
-    session: aiohttp.ClientSession, courses: List[Course], recent_only
+    session: aiohttp.ClientSession, courses: List[Course], recent_only: bool
 ) -> None:
     """
         TODO refactor this to be align better with OOP principles, ex:
