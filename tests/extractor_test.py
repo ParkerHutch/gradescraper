@@ -1,6 +1,6 @@
 import requests
 from util import extractor
-import pytest  # make sure to pip install pytest-dependency
+import pytest
 from bs4 import BeautifulSoup
 
 @pytest.mark.dependency(name='auth_token')
@@ -9,14 +9,15 @@ def test_get_auth_token():
         assert extractor.get_auth_token(session).strip() is not ''
 
 @pytest.mark.dependency(depends=['auth_token'])
-def test_get_login_soup():
+@pytest.mark.asyncio
+async def test_get_login_soup():
     bad_login_json = {
         "username": "invalid",
         "password": "wrong"
     }
     with requests.session() as session:
         with pytest.raises(Exception):
-            extractor.get_login_soup(session, bad_login_json)
+            await extractor.async_get_login_soup(session, bad_login_json)
 
 
 def test_extract_courses():

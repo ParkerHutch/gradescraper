@@ -1,11 +1,8 @@
-from util import course
 from util.course import Course
 from bs4 import BeautifulSoup, SoupStrainer
 from util.assignment import Assignment
 from datetime import datetime
-import time
-import asyncio
-import aiohttp
+from util.term import Term
 
 base_url = 'https://www.gradescope.com'
 
@@ -18,9 +15,9 @@ def get_auth_token(session):
 def extract_courses(dashboard_page_soup): # TODO try to make this async, or make the individual course extraction async
     courses = [] 
     course_list_div_children = list(dashboard_page_soup.find('div', {'class': 'courseList'}).children)
-    
+    print(course_list_div_children)
     for i in [x for x in range(len(course_list_div_children) - 1) if x % 2 == 0]:
-        term = course_list_div_children[i].string
+        term = Term(*course_list_div_children[i].string.split(' '))
         term_courses_div = course_list_div_children[i+1]
         for tag in term_courses_div.find_all('a', class_='courseBox'):
             course_num = tag.get('href').replace('/courses/', '')
@@ -76,7 +73,6 @@ def get_course_assignments(session, course_num):
 
 async def async_get_auth_token(url, session):
     response = await session.get(url)
-    # TODO use response.raise_for_status() ?
     response_text = await response.text()
     parsed_init_resp = BeautifulSoup(response_text, 'lxml', parse_only=SoupStrainer("input"))
     return (parsed_init_resp.find('input', {'name': 'authenticity_token'})).get("value")
@@ -107,4 +103,9 @@ async def async_retrieve_course_assignments(session, course):
     
     assignments_soup = BeautifulSoup(await course_page_response.text(), 'lxml', parse_only=SoupStrainer('tr')).find_all('tr')[1:]
     
-    course.assignments = [extract_assignment_from_row(row) for row in assignments_soup] # TODO maybe async here
+    course.assignments = [extract_assignment_from_row(row) for row in assignments_soup]
+
+# Returns a list of the courses from the most recent year and season
+def strip_old_courses(courses_list):
+    most_recent_term = sorted(courses_list, key=lambda x: x.term)[0].term
+    return [course for course in courses_list if course.term == most_recent_term]
