@@ -3,11 +3,14 @@ from util import extractor
 import pytest
 from bs4 import BeautifulSoup
 
+base_url = 'https://www.gradescope.com'
 
 @pytest.mark.dependency(name='auth_token')
-def test_get_auth_token():
+@pytest.mark.asyncio
+async def test_get_auth_token():
     with requests.session() as session:
-        assert extractor.get_auth_token(session).strip() is not ''
+        response_obj = extractor.async_get_auth_token(base_url, session)
+        assert response_obj is not ''
 
 
 @pytest.mark.dependency(depends=['auth_token'])

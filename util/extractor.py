@@ -10,15 +10,6 @@ import asyncio
 base_url = 'https://www.gradescope.com'
 
 
-def get_auth_token(session: aiohttp.ClientSession):
-    parsed_init_resp = BeautifulSoup(
-        session.get(base_url).text, 'lxml', parse_only=SoupStrainer("input")
-    )
-    return (
-        parsed_init_resp.find('input', {'name': 'authenticity_token'})
-    ).get("value")
-
-
 def extract_courses(
     dashboard_page_soup,
 ):  # TODO try to make this async, or make the individual course extraction async
@@ -50,33 +41,6 @@ def extract_courses(
             )
 
     return courses
-
-
-def get_login_soup(session: aiohttp.ClientSession, account_info_json):
-
-    if not all(
-        x in account_info_json for x in ['email', 'password']
-    ):  # TODO try turning this into just two boolean conditions rather than a search
-        raise Exception('Insufficient account information provided.')
-
-    post_params = {
-        "session[email]": account_info_json['email'],
-        "session[password]": account_info_json['password'],
-        "authenticity_token": get_auth_token(session),
-    }
-
-    # Login and get the response, or access the base url if the user is already logged in.
-    response = session.post(
-        f'{base_url}/login', params=post_params
-    ) or session.get(base_url)
-
-    soup = BeautifulSoup(response.content, 'lxml')
-    if soup.find('title').string == 'Log In | Gradescope':
-        raise Exception(
-            'Failed to log in. Please check username and password.'
-        )
-
-    return soup
 
 
 def extract_assignment_from_row(row_soup, course_name, assignment_year):
