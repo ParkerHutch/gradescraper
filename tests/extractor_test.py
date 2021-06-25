@@ -50,7 +50,7 @@ def test_extract_submitted_assignment():
     """
     row_input_soup = BeautifulSoup(row_input_html, 'lxml')
     extracted_assignment = extractor.extract_assignment_from_row(
-        row_input_soup, 2021
+        row_input_soup, 'Example', 2021
     )
     assert extracted_assignment.name == 'Final Exam'
     assert extracted_assignment.submitted == True
@@ -84,7 +84,7 @@ def test_extract_unsubmitted_assignment():
     """
     row_input_soup = BeautifulSoup(row_input_html, 'lxml')
     extracted_assignment = extractor.extract_assignment_from_row(
-        row_input_soup, 2021
+        row_input_soup, 'Example', 2021
     )
     assert extracted_assignment.name == 'Incomplete Assignment'
     assert extracted_assignment.submitted == False
@@ -118,7 +118,7 @@ def test_extract_scored_assignment():
     """
     row_input_soup = BeautifulSoup(row_input_html, 'lxml')
     extracted_assignment = extractor.extract_assignment_from_row(
-        row_input_soup, 2021
+        row_input_soup, 'Example', 2021
     )
     assert extracted_assignment.name == 'Scored Exam Example'
     assert extracted_assignment.submitted == True
@@ -155,7 +155,7 @@ def test_extract_assignment_with_late_due_date():
     """
     row_input_soup = BeautifulSoup(row_input_html, 'lxml')
     extracted_assignment = extractor.extract_assignment_from_row(
-        row_input_soup, 2021
+        row_input_soup, 'Example', 2021
     )
     assert extracted_assignment.name == 'Assignment with Late Due Date'
     assert extracted_assignment.submitted == False
