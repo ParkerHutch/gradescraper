@@ -3,34 +3,67 @@
 from util import extractor
 import asyncio
 import aiohttp
-import time
 import json
 
 import platform
 from functools import wraps
 from asyncio.proactor_events import _ProactorBasePipeTransport
 
-#from datetime import datetime
 import datetime
-base_url = 'https://www.gradescope.com'
+
+import argparse
+from util.messenger import GradescopeMesssenger
+from util import processor
+"""
+        TODO
+            - Loading circle
+            - Timeout
+            - async_get_auth_token takes most of the program time, see if there's a way to speed it up
+            - Add something to documentation about how cchardet supposedly speeds up encoding
+            - Make a requirements.txt
+            - More error handling
+"""
+
+
+def get_parser() -> argparse.ArgumentParser:
+    """Build an ArgumentParser to handle various command line arguments.
+
+    Returns:
+        argparse.ArgumentParser: an ArgumentParser to handle command line 
+        arguments
+    """
+    parser = argparse.ArgumentParser(
+        description='Get upcoming assignments from the Gradescope website.')
+    parser.add_argument('-v', '--verbose', 
+                        help='show output when running the program', 
+                        action='store_true')
+    parser.add_argument('-f', '--file', 
+                        help='use file for account information', 
+                        type=str,
+                        default='')
+    parser.add_argument('--store', 
+                        help='store username and password in ./data.json for later use', 
+                        action='store_true')
+    
+    return parser
+
+base_url = 'https://www.gradescope.com' # TODO remove
 account_info_filename = 'data.json'
 
 
 async def retrieve_courses_and_recent_assignments():
     # TODO: move this method into extractor?
-    async with aiohttp.ClientSession(raise_for_status=True) as session:
-        with open('data.json', 'r') as account_file:
-            soup = await extractor.async_get_login_soup(
-                session, json.load(account_file)
-            )
+    with open('data.json', 'r') as account_file:
+        json_account_info = json.load(account_file)
+        messenger = GradescopeMesssenger()
+        soup = await messenger.async_login(json_account_info['email'], json_account_info['password']) # TODO later this should just be incorporated into each method inside messenger
 
-            courses = extractor.extract_courses(soup)
+        courses = processor.extract_courses(soup)
 
-            await extractor.retrieve_assignments_for_courses(
-                session, courses, recent_only=True
-            )
-
-            return courses
+        await messenger.retrieve_assignments_for_courses(courses, recent_only=True)
+        await messenger.session.close()
+        return courses
+        # rewrite here
 
 
 """
@@ -54,15 +87,7 @@ def silence_event_loop_closed(func):
 
 if __name__ == '__main__':
 
-    """
-        TODO
-            - Loading circle
-            - Timeout
-            - async_get_auth_token takes most of the program time, see if there's a way to speed it up
-            - Add something to documentation about how cchardet supposedly speeds up encoding
-            - Make a requirements.txt
-            - More error handling
-    """
+    args = get_parser().parse_args()
 
     # Silence the RuntimeError if the OS is Windows
     if platform.system() == 'Windows':
