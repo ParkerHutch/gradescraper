@@ -16,6 +16,18 @@ class GradescopeMesssenger:
         self.email = email
         self.password = password
     
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc_value, exc_traceback):
+        #if exc_value == None:
+            #pass
+            #print 'Test %d passed' % self.test_number
+        #else:
+            #print 'Test %d failed: %s' % (self.test_number, exc_value)
+            #pass
+        return await self.session.close()
+        #return True
 
     async def get_auth_token(self):
         response = await self.session.get(self.base_url)

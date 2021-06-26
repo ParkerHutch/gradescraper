@@ -110,10 +110,9 @@ async def main():
             account_dict = {"email": account_email, "password": password}
             json.dump(account_dict, account_file, ensure_ascii=False, indent=4)
 
-    messenger = GradescopeMesssenger(account_email, password)
-    courses = await messenger.get_courses_and_assignments()
-    await messenger.session.close() # TODO add this to a finally?
-
+    async with GradescopeMesssenger(account_email, password) as messenger:
+        courses = await messenger.get_courses_and_assignments()
+    
     today = datetime.datetime(2021, 4, 10)# TODO should actually be datetime.now() in prod
 
     upcoming_assignments = [assignment for course in courses for assignment in course.get_assignments_in_range(today, today + datetime.timedelta(days = 7))]
