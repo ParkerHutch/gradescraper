@@ -19,6 +19,7 @@ from util.messenger import GradescopeMesssenger
             - Make a requirements.txt
             - More error handling
             - YAML for user info
+            - Organized file structure
 """
 
 def get_parser() -> argparse.ArgumentParser:
@@ -88,10 +89,9 @@ async def main():
 
     async with GradescopeMesssenger(account_email, password) as messenger:
         courses = await messenger.get_courses_and_assignments()
-
-    today = datetime.datetime(
-        2021, 4, 10
-    )  # TODO should actually be datetime.now() in prod
+    
+    # TODO should actually be datetime.now() in prod
+    today = datetime.datetime(2021, 4, 10)  
 
     upcoming_assignments = [
         assignment

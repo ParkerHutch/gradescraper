@@ -1,22 +1,24 @@
-from util.term import Term
-from util.course import Course
-from typing import List
 from datetime import datetime
-from util.assignment import Assignment
 from operator import attrgetter
+from typing import List
 
-def extract_courses(dashboard_page_soup):
-    courses = []
-    course_list_div_children = list(
+from bs4 import BeautifulSoup, element
+
+from util.assignment import Assignment
+from util.course import Course
+from util.term import Term
+
+
+def extract_courses(dashboard_page_soup: BeautifulSoup):
+    courses: List[Course] = []
+    course_list_div_children: List[BeautifulSoup] = list(
         dashboard_page_soup.find('div', {'class': 'courseList'}).children
     )
     for i in [
         x for x in range(len(course_list_div_children) - 1) if x % 2 == 0
     ]:
-        term_season, term_year_str = course_list_div_children[i].string.split(
-            ' '
-        )
-        term = Term(term_season, int(term_year_str))
+        term_season, term_year = course_list_div_children[i].string.split(' ')
+        term = Term(term_season, int(term_year))
         term_courses_div = course_list_div_children[i + 1]
         for tag in term_courses_div.find_all('a', class_='courseBox'):
             course_num = tag.get('href').replace('/courses/', '')
@@ -36,35 +38,37 @@ def extract_courses(dashboard_page_soup):
     return courses
 
 
-def extract_assignment_from_row(row_soup, course_name, assignment_year):
-    submitted = not row_soup.find(
+def extract_assignment_from_row(
+    row: BeautifulSoup, course_name: str, assignment_year: str
+):
+    submitted = not row.find(
         'td', {'class': 'submissionStatus submissionStatus-warning'}
     )
-    assignment_link_header = row_soup.find(
+    assignment_link_header: element.Tag = row.find(
         'th', {'class': 'table--primaryLink'}
     )
-    assignment_link_element = assignment_link_header.find('a')
-    assignment_name = (
+    assignment_link_element: element.Tag = assignment_link_header.find('a')
+    assignment_name: str = (
         assignment_link_element or assignment_link_header
     ).string
 
     base_url = 'https://www.gradescope.com'
 
-    assignment_url = (
+    assignment_url: str = (
         base_url + assignment_link_element['href'].split('/submissions')[0]
         if assignment_link_element
         else ''
     )
 
-    release_date = row_soup.find(
+    release_date: str = row.find(
         'span', {'class': 'submissionTimeChart--releaseDate'}
-    ).contents
+    ).string
 
     due_dates = [
         datetime.strptime(
             span.string.split('Due Date: ')[-1], '%b %d at %I:%M%p'
         ).replace(year=int(assignment_year))
-        for span in row_soup.find_all(
+        for span in row.find_all(
             'span', {'class': 'submissionTimeChart--dueDate'}
         )
     ]
@@ -79,6 +83,7 @@ def extract_assignment_from_row(row_soup, course_name, assignment_year):
         due_date,
         late_due_date,
     )
+
 
 # Returns a list of the courses from the most recent year and season
 def strip_old_courses(courses_list: List[Course]) -> List[Course]:

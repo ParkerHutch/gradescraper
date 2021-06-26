@@ -1,11 +1,11 @@
+import asyncio
 from typing import ClassVar, List
 
 import aiohttp
 from bs4 import BeautifulSoup, SoupStrainer
 
-from util.course import Course
-import asyncio
 from util import processor
+from util.course import Course
 
 
 class GradescopeMesssenger:
@@ -23,7 +23,7 @@ class GradescopeMesssenger:
     async def __aexit__(self, exc_type, exc_value, exc_traceback):
         await self.session.close()
 
-    async def get_auth_token(self):
+    async def get_auth_token(self) -> str:
         response = await self.session.get(self.base_url)
         response_text = await response.text()
         parsed_init_resp = BeautifulSoup(
@@ -33,7 +33,7 @@ class GradescopeMesssenger:
             parsed_init_resp.find('input', {'name': 'authenticity_token'})
         ).get("value")
 
-    async def login(self):
+    async def login(self) -> BeautifulSoup:
         post_params = {
             "session[email]": self.email,
             "session[password]": self.password,
@@ -50,6 +50,7 @@ class GradescopeMesssenger:
             raise Exception(
                 'Failed to log in. Please check username and password.'
             )
+            self.logged_in = False
         else:
             self.logged_in = True
 
@@ -77,7 +78,7 @@ class GradescopeMesssenger:
 
     async def retrieve_assignments_for_courses(
         self, courses: List[Course], recent_only: bool
-    ) -> None:
+    ):
         """
         TODO refactor this to be align better with OOP principles, ex:
         for course in courses:
@@ -98,7 +99,7 @@ class GradescopeMesssenger:
                 ]
             )
 
-    async def get_courses_and_assignments(self, recent_only=True):
+    async def get_courses_and_assignments(self, recent_only: bool = True):
         soup = await self.login()
 
         courses = processor.extract_courses(soup)
