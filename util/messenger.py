@@ -7,6 +7,7 @@ from util.course import Course
 import asyncio
 from util import processor
 
+
 class GradescopeMesssenger:
     base_url: ClassVar[str] = 'https://www.gradescope.com'
 
@@ -15,19 +16,12 @@ class GradescopeMesssenger:
         self.logged_in: bool = False
         self.email = email
         self.password = password
-    
+
     async def __aenter__(self):
         return self
 
     async def __aexit__(self, exc_type, exc_value, exc_traceback):
-        #if exc_value == None:
-            #pass
-            #print 'Test %d passed' % self.test_number
-        #else:
-            #print 'Test %d failed: %s' % (self.test_number, exc_value)
-            #pass
-        return await self.session.close()
-        #return True
+        await self.session.close()
 
     async def get_auth_token(self):
         response = await self.session.get(self.base_url)
@@ -39,9 +33,7 @@ class GradescopeMesssenger:
             parsed_init_resp.find('input', {'name': 'authenticity_token'})
         ).get("value")
 
-    async def login(
-        self
-    ):
+    async def login(self):
         post_params = {
             "session[email]": self.email,
             "session[password]": self.password,
@@ -62,13 +54,11 @@ class GradescopeMesssenger:
             self.logged_in = True
 
         return soup
-    
-    async def retrieve_assignments_for_course(
-        self, course: Course
-    ):
+
+    async def retrieve_assignments_for_course(self, course: Course):
         if not self.logged_in:
             await self.login()
-        
+
         course_page_response = await self.session.get(
             f'{self.base_url}/courses/{course.course_num}'
         )
@@ -79,17 +69,19 @@ class GradescopeMesssenger:
             parse_only=SoupStrainer('tr'),
         ).find_all('tr')[1:]
         course.assignments = [
-            processor.extract_assignment_from_row(row, course.name, course.term.year)
+            processor.extract_assignment_from_row(
+                row, course.name, course.term.year
+            )
             for row in assignments_soup
         ]
-    
+
     async def retrieve_assignments_for_courses(
         self, courses: List[Course], recent_only: bool
     ) -> None:
         """
-            TODO refactor this to be align better with OOP principles, ex:
-            for course in courses:
-                course.assignments = async_get_assignments(course.course_num)
+        TODO refactor this to be align better with OOP principles, ex:
+        for course in courses:
+            course.assignments = async_get_assignments(course.course_num)
         """
         if recent_only:
             await asyncio.gather(
@@ -105,9 +97,9 @@ class GradescopeMesssenger:
                     for course in courses
                 ]
             )
-    
+
     async def get_courses_and_assignments(self, recent_only=True):
-        soup = await self.login() # TODO later this should just be incorporated into each method inside messenger
+        soup = await self.login()
 
         courses = processor.extract_courses(soup)
 
