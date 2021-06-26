@@ -16,7 +16,7 @@ class GradescopeMesssenger:
         self.email = email
         self.password = password
 
-    async def async_get_auth_token(self):
+    async def get_auth_token(self):
         response = await self.session.get(self.base_url)
         response_text = await response.text()
         parsed_init_resp = BeautifulSoup(
@@ -26,13 +26,13 @@ class GradescopeMesssenger:
             parsed_init_resp.find('input', {'name': 'authenticity_token'})
         ).get("value")
 
-    async def async_login(
+    async def login(
         self
     ):
         post_params = {
             "session[email]": self.email,
             "session[password]": self.password,
-            "authenticity_token": await self.async_get_auth_token(),
+            "authenticity_token": await self.get_auth_token(),
         }
 
         # Login and get the response, or access the base url if the user is already logged in.
@@ -50,11 +50,11 @@ class GradescopeMesssenger:
 
         return soup
     
-    async def async_retrieve_course_assignments(
+    async def retrieve_assignments_for_course(
         self, course: Course
     ):
         if not self.logged_in:
-            await self.async_login()
+            await self.login()
         
         course_page_response = await self.session.get(
             f'{self.base_url}/courses/{course.course_num}'
@@ -81,14 +81,23 @@ class GradescopeMesssenger:
         if recent_only:
             await asyncio.gather(
                 *[
-                    self.async_retrieve_course_assignments(course)
+                    self.retrieve_assignments_for_course(course)
                     for course in processor.strip_old_courses(courses)
                 ]
             )
         else:
             await asyncio.gather(
                 *[
-                    self.async_retrieve_course_assignments(course)
+                    self.retrieve_assignments_for_course(course)
                     for course in courses
                 ]
             )
+    
+    async def get_courses_and_assignments(self, recent_only=True):
+        soup = await self.login() # TODO later this should just be incorporated into each method inside messenger
+
+        courses = processor.extract_courses(soup)
+
+        await self.retrieve_assignments_for_courses(courses, recent_only)
+
+        return courses

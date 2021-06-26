@@ -106,15 +106,10 @@ async def main():
         account_email, password = args.account
 
     messenger = GradescopeMesssenger(account_email, password)
-    # TODO put the next 3 methods into a messenger single method, basically turning processor into a private class
-    soup = await messenger.async_login() # TODO later this should just be incorporated into each method inside messenger
-
-    courses = processor.extract_courses(soup)
-
-    await messenger.retrieve_assignments_for_courses(courses, recent_only=True)
+    courses = await messenger.get_courses_and_assignments()
     await messenger.session.close() # TODO add this to a finally?
 
-    today = datetime.datetime(2021, 4, 10)# TODO should actually be datetime.now()
+    today = datetime.datetime(2021, 4, 10)# TODO should actually be datetime.now() in prod
 
     upcoming_assignments = [assignment for course in courses for assignment in course.get_assignments_in_range(today, today + datetime.timedelta(days = 7))]
     
