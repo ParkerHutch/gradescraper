@@ -1,11 +1,11 @@
-from typing import List
-from util.term import Term
 import datetime
-from util.assignment import Assignment
+from typing import List
 
+from gradescraper.structures.assignment import Assignment
+from gradescraper.structures.term import Term
 
 class Course:
-    """A class for storing a Course's identifying information and its 
+    """A class for storing a Course's identifying information and its
     assignments. Utilities for retrieving assignments are also included.
     """
 
@@ -18,8 +18,8 @@ class Course:
         assignments_num: int,
     ):
         """Create a unique Course object.
-        
-        Create a Course for the given school term with identifying course 
+
+        Create a Course for the given school term with identifying course
         number, name, and short name. Also store a number for the course's total
         number of assignments.
 
@@ -47,18 +47,18 @@ class Course:
     ) -> List[Assignment]:
         """Get the assignments within the specified range.
 
-        Gets the assignments between the two specified dates. If 
+        Gets the assignments between the two specified dates. If
         unsubmitted_only is True, only unsubmitted assignments are returned,
         otherwise submitted and unsubmitted assignments may be returned. If an
         invalid range is passed (start_date refers to a date after end_date),
         an empty List is returned.
 
         Args:
-            start_date (datetime.datetime): The start date of the range to 
+            start_date (datetime.datetime): The start date of the range to
             search for assignments in
             end_date (datetime.datetime): The end date of the range to search
             for assignments in
-            unsubmitted_only (bool, optional): Whether to only return 
+            unsubmitted_only (bool, optional): Whether to only return
             unsubmitted assignments. Defaults to False.
 
         Returns:
@@ -66,7 +66,7 @@ class Course:
         """
         if start_date > end_date:
             return []
-        
+
         assignments_to_return = []
         for assignment in self.assignments:
             if (

@@ -1,8 +1,8 @@
 import requests
-from util.messenger import GradescopeMessenger
+from gradescraper.util.messenger import GradescopeMessenger
 import pytest
 from bs4 import BeautifulSoup
-from util import processor
+from gradescraper.util import processor
 
 @pytest.mark.dependency(name='auth_token')
 @pytest.mark.asyncio

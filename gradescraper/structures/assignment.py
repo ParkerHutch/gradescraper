@@ -1,5 +1,4 @@
 class Assignment:
-    # TODO should add course name here
     def __init__(self, name, course_name, submitted):
         self.name = name
         self.course_name = course_name

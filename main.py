@@ -8,7 +8,7 @@ import platform
 from asyncio.proactor_events import _ProactorBasePipeTransport
 from functools import wraps
 
-from util.messenger import GradescopeMessenger
+from gradescraper.util.messenger import GradescopeMessenger
 
 
 def get_parser() -> argparse.ArgumentParser:

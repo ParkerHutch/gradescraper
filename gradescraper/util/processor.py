@@ -4,10 +4,9 @@ from typing import List
 
 from bs4 import BeautifulSoup, element
 
-from util.assignment import Assignment
-from util.course import Course
-from util.term import Term
-
+from gradescraper.structures.assignment import Assignment
+from gradescraper.structures.course import Course
+from gradescraper.structures.term import Term
 
 def extract_courses(dashboard_page_soup: BeautifulSoup):
     courses: List[Course] = []

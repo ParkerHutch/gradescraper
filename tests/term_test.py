@@ -1,4 +1,4 @@
-from util.term import Term
+from gradescraper.structures.term import Term
 
 
 def test_comparison():

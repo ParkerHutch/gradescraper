@@ -4,8 +4,8 @@ from typing import ClassVar, List
 import aiohttp
 from bs4 import BeautifulSoup, SoupStrainer
 
-from util import processor
-from util.course import Course
+from gradescraper.util import processor
+from gradescraper.structures.course import Course
 
 
 class GradescopeMessenger:
