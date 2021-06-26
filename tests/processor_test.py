@@ -1,31 +1,10 @@
-import requests
-from gradescraper.util.messenger import GradescopeMessenger
-import pytest
 from bs4 import BeautifulSoup
 from gradescraper.util import processor
-
-@pytest.mark.dependency(name='auth_token')
-@pytest.mark.asyncio
-async def test_get_auth_token():
-    async with GradescopeMessenger() as messenger:
-        response_obj = messenger.get_auth_token()
-        assert response_obj is not ''
-
-
-@pytest.mark.dependency(depends=['auth_token'])
-@pytest.mark.asyncio
-async def test_get_login_soup():
-    async with GradescopeMessenger('invalid-address@email.com', 'badPassword') as messenger:
-        with pytest.raises(Exception):
-            await messenger.login()
-
 
 def test_extract_courses():
     with open('tests/courses_dashboard.html', 'r') as courses_html:
         soup = BeautifulSoup(courses_html, 'lxml')
         assert processor.extract_courses(soup)
-
-
 def test_extract_submitted_assignment():
     row_input_html = """
     <tr role="row" class="odd">
@@ -172,4 +151,3 @@ def test_extract_assignment_with_late_due_date():
     assert extracted_assignment.late_due_date.hour == 17
     assert extracted_assignment.late_due_date.minute == 10
     assert extracted_assignment.late_due_date.year == 2021
-
