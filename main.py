@@ -21,8 +21,11 @@ from util import processor
             - Add something to documentation about how cchardet supposedly speeds up encoding
             - Make a requirements.txt
             - More error handling
+            - YAML for user info
 """
 
+def parse_account(args):
+    print(args)#with open(args.file)
 
 def get_parser() -> argparse.ArgumentParser:
     """Build an ArgumentParser to handle various command line arguments.
@@ -36,15 +39,16 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument('-v', '--verbose', 
                         help='show output when running the program', 
                         action='store_true')
-    parser.add_argument('-f', '--file', metavar='FILE',
-                        help='use file for account information', 
-                        type=str,
-                        default='')
     parser.add_argument('--store', 
                         help='store username and password in the given filename for later use', 
                         type=str,
                         default='')
-    parser.add_argument('--account', nargs=2, metavar=('USERNAME', 'PASSWORD'),
+    account_info_group = parser.add_mutually_exclusive_group(required=True)
+    account_info_group.add_argument('-f', '--file', metavar='FILE',
+                        help='use file for account information', 
+                        type=str,
+                        default='')
+    account_info_group.add_argument('--account', nargs=2, metavar=('USERNAME', 'PASSWORD'),
                         help='use given account name for Gradescope login, overriding the value stored in the file if passed with --file. Requires password to be specified via --file or --account',
                         type=str,
                         default='')
@@ -91,37 +95,32 @@ def silence_event_loop_closed(func):
 async def main():
     print('\U0001F4F6 Extracting courses and assignments...')
     args = get_parser().parse_args() # TODO make sure this works
-    email = ''
-    
-    if args.account:
-        print(args.account)
+    account_email = ''
+    password = ''
+
+    if args.file:
+        with open(args.file, 'r') as account_file:
+            account_json = json.load(account_file)
+            account_email, password = account_json['email'], account_json['password']
     else:
-        return ''
-    #if args.file:
-        #with open(args.file, 'r') as account_file:
+        account_email, password = args.account
 
-    #account_email, password = args
-    #account_email = args.account or :
+    messenger = GradescopeMesssenger(account_email, password)
+    # TODO put the next 3 methods into a messenger single method, basically turning processor into a private class
+    soup = await messenger.async_login() # TODO later this should just be incorporated into each method inside messenger
 
-    with open('data.json', 'r') as account_file:
-        json_account_info = json.load(account_file)
-        messenger = GradescopeMesssenger(json_account_info['email'], json_account_info['password'])
-        soup = await messenger.async_login() # TODO later this should just be incorporated into each method inside messenger
+    courses = processor.extract_courses(soup)
 
-        courses = processor.extract_courses(soup)
+    await messenger.retrieve_assignments_for_courses(courses, recent_only=True)
+    await messenger.session.close() # TODO add this to a finally?
 
-        await messenger.retrieve_assignments_for_courses(courses, recent_only=True)
-        await messenger.session.close() # TODO add this to a finally?
-        #return courses
-        #courses = asyncio.run(retrieve_courses_and_recent_assignments())
+    today = datetime.datetime(2021, 4, 10)# TODO should actually be datetime.now()
 
-        today = datetime.datetime(2021, 4, 10)# TODO should actually be datetime.now()
-
-        upcoming_assignments = [assignment for course in courses for assignment in course.get_assignments_in_range(today, today + datetime.timedelta(days = 7))]
-        
-        print('Upcoming assignments:')
-        for assignment in upcoming_assignments:
-            print(assignment)
+    upcoming_assignments = [assignment for course in courses for assignment in course.get_assignments_in_range(today, today + datetime.timedelta(days = 7))]
+    
+    print('Upcoming assignments:')
+    for assignment in upcoming_assignments:
+        print(assignment)
     
 if __name__ == '__main__':
 
