@@ -39,7 +39,7 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument('-v', '--verbose', 
                         help='show output when running the program', 
                         action='store_true')
-    parser.add_argument('--store', 
+    parser.add_argument('--store-account', 
                         help='store username and password in the given filename for later use', 
                         type=str,
                         default='')
@@ -104,6 +104,11 @@ async def main():
             account_email, password = account_json['email'], account_json['password']
     else:
         account_email, password = args.account
+
+    if args.store_account:
+        with open(args.store_account, 'w') as account_file:
+            account_dict = {"email": account_email, "password": password}
+            json.dump(account_dict, account_file, ensure_ascii=False, indent=4)
 
     messenger = GradescopeMesssenger(account_email, password)
     courses = await messenger.get_courses_and_assignments()

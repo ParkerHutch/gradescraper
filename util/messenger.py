@@ -15,6 +15,7 @@ class GradescopeMesssenger:
         self.logged_in: bool = False
         self.email = email
         self.password = password
+    
 
     async def get_auth_token(self):
         response = await self.session.get(self.base_url)
