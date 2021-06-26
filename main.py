@@ -36,20 +36,26 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument('-v', '--verbose', 
                         help='show output when running the program', 
                         action='store_true')
-    parser.add_argument('-f', '--file', 
+    parser.add_argument('-f', '--file', metavar='FILE',
                         help='use file for account information', 
                         type=str,
                         default='')
     parser.add_argument('--store', 
-                        help='store username and password in ./data.json for later use', 
-                        action='store_true')
+                        help='store username and password in the given filename for later use', 
+                        type=str,
+                        default='')
+    parser.add_argument('--account', nargs=2, metavar=('USERNAME', 'PASSWORD'),
+                        help='use given account name for Gradescope login, overriding the value stored in the file if passed with --file. Requires password to be specified via --file or --account',
+                        type=str,
+                        default='')
+    
     
     return parser
 
 base_url = 'https://www.gradescope.com' # TODO remove
-account_info_filename = 'data.json'
+account_info_filename = 'data.json' # TODO remove
 
-
+"""
 async def retrieve_courses_and_recent_assignments():
     # TODO: move this method into extractor?
     with open('data.json', 'r') as account_file:
@@ -62,7 +68,7 @@ async def retrieve_courses_and_recent_assignments():
         await messenger.retrieve_assignments_for_courses(courses, recent_only=True)
         await messenger.session.close() # TODO add this to a finally?
         return courses
-
+"""
 
 """
 The below 'dirty' fix silences a weird RunTime Error raised when the ProactorBasePipeTransport
@@ -82,26 +88,49 @@ def silence_event_loop_closed(func):
 
     return wrapper
 
+async def main():
+    print('\U0001F4F6 Extracting courses and assignments...')
+    args = get_parser().parse_args() # TODO make sure this works
+    email = ''
+    
+    if args.account:
+        print(args.account)
+    else:
+        return ''
+    #if args.file:
+        #with open(args.file, 'r') as account_file:
 
+    #account_email, password = args
+    #account_email = args.account or :
+
+    with open('data.json', 'r') as account_file:
+        json_account_info = json.load(account_file)
+        messenger = GradescopeMesssenger(json_account_info['email'], json_account_info['password'])
+        soup = await messenger.async_login() # TODO later this should just be incorporated into each method inside messenger
+
+        courses = processor.extract_courses(soup)
+
+        await messenger.retrieve_assignments_for_courses(courses, recent_only=True)
+        await messenger.session.close() # TODO add this to a finally?
+        #return courses
+        #courses = asyncio.run(retrieve_courses_and_recent_assignments())
+
+        today = datetime.datetime(2021, 4, 10)# TODO should actually be datetime.now()
+
+        upcoming_assignments = [assignment for course in courses for assignment in course.get_assignments_in_range(today, today + datetime.timedelta(days = 7))]
+        
+        print('Upcoming assignments:')
+        for assignment in upcoming_assignments:
+            print(assignment)
+    
 if __name__ == '__main__':
-
-    args = get_parser().parse_args()
 
     # Silence the RuntimeError if the OS is Windows
     if platform.system() == 'Windows':
         _ProactorBasePipeTransport.__del__ = silence_event_loop_closed(
             _ProactorBasePipeTransport.__del__
         )
+    asyncio.run(main())
 
-    print('\U0001F4F6 Extracting courses and assignments...')
-    courses = asyncio.run(retrieve_courses_and_recent_assignments())
-
-    today = datetime.datetime(2021, 4, 10)# TODO should actually be datetime.now()
-
-    upcoming_assignments = [assignment for course in courses for assignment in course.get_assignments_in_range(today, today + datetime.timedelta(days = 7))]
-    
-    print('Upcoming assignments:')
-    for assignment in upcoming_assignments:
-        print(assignment)
 
 
