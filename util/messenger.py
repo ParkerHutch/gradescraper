@@ -10,12 +10,11 @@ from util import processor
 class GradescopeMesssenger:
     base_url: ClassVar[str] = 'https://www.gradescope.com'
 
-    def __init__(self) -> None:
-        session: aiohttp.ClientSession = None
+    def __init__(self, email: str, password: str) -> None:
+        self.session: aiohttp.ClientSession = aiohttp.ClientSession()
         self.logged_in: bool = False
-        self.username = ''
-        self.password = ''
-
+        self.email = email
+        self.password = password
 
     async def async_get_auth_token(self):
         response = await self.session.get(self.base_url)
@@ -28,12 +27,11 @@ class GradescopeMesssenger:
         ).get("value")
 
     async def async_login(
-        self, email, password # TODO take in optional args for user/passwd 
+        self
     ):
-        self.session = aiohttp.ClientSession()
         post_params = {
-            "session[email]": email,
-            "session[password]": password,
+            "session[email]": self.email,
+            "session[password]": self.password,
             "authenticity_token": await self.async_get_auth_token(),
         }
 
@@ -47,37 +45,17 @@ class GradescopeMesssenger:
             raise Exception(
                 'Failed to log in. Please check username and password.'
             )
+        else:
+            self.logged_in = True
 
         return soup
     
-    async def async_get_login_soup(
-        self, account_info_json # TODO take in optional args for user/passwd 
-    ):
-        if not all(x in account_info_json for x in ['email', 'password']): # TODO just check each manually
-            raise Exception('Insufficient account information provided.')
-
-        post_params = {
-            "session[email]": account_info_json['email'],
-            "session[password]": account_info_json['password'],
-            "authenticity_token": await self.async_get_auth_token(),
-        }
-
-        # Login and get the response, or access the base url if the user is already logged in.
-        response = await self.session.post(
-            f'{self.base_url}/login', params=post_params
-        ) or await self.session.get(self.base_url)
-
-        soup = BeautifulSoup(await response.text(), 'lxml')
-        if soup.find('title').string == 'Log In | Gradescope':
-            raise Exception(
-                'Failed to log in. Please check username and password.'
-            )
-
-        return soup
-
     async def async_retrieve_course_assignments(
         self, course: Course
     ):
+        if not self.logged_in:
+            await self.async_login()
+        
         course_page_response = await self.session.get(
             f'{self.base_url}/courses/{course.course_num}'
         )

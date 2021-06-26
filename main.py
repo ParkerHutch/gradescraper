@@ -1,6 +1,5 @@
 # Gradescope API Info: https://courses.csail.mit.edu/6.857/2016/files/20.pdf
 
-from util import extractor
 import asyncio
 import aiohttp
 import json
@@ -55,15 +54,14 @@ async def retrieve_courses_and_recent_assignments():
     # TODO: move this method into extractor?
     with open('data.json', 'r') as account_file:
         json_account_info = json.load(account_file)
-        messenger = GradescopeMesssenger()
-        soup = await messenger.async_login(json_account_info['email'], json_account_info['password']) # TODO later this should just be incorporated into each method inside messenger
+        messenger = GradescopeMesssenger(json_account_info['email'], json_account_info['password'])
+        soup = await messenger.async_login() # TODO later this should just be incorporated into each method inside messenger
 
         courses = processor.extract_courses(soup)
 
         await messenger.retrieve_assignments_for_courses(courses, recent_only=True)
-        await messenger.session.close()
+        await messenger.session.close() # TODO add this to a finally?
         return courses
-        # rewrite here
 
 
 """
