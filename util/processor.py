@@ -3,10 +3,9 @@ from util.course import Course
 from typing import List
 from datetime import datetime
 from util.assignment import Assignment
+from operator import attrgetter
 
-def extract_courses(
-    dashboard_page_soup,
-):  # TODO try to make this async, or make the individual course extraction async
+def extract_courses(dashboard_page_soup):
     courses = []
     course_list_div_children = list(
         dashboard_page_soup.find('div', {'class': 'courseList'}).children
@@ -83,7 +82,7 @@ def extract_assignment_from_row(row_soup, course_name, assignment_year):
 
 # Returns a list of the courses from the most recent year and season
 def strip_old_courses(courses_list: List[Course]) -> List[Course]:
-    most_recent_term = sorted(courses_list, key=lambda x: x.term)[0].term
+    most_recent_term = min(courses_list, key=attrgetter('term')).term
     return [
         course for course in courses_list if course.term == most_recent_term
     ]
