@@ -8,10 +8,10 @@ from util import processor
 from util.course import Course
 
 
-class GradescopeMesssenger:
+class GradescopeMessenger:
     base_url: ClassVar[str] = 'https://www.gradescope.com'
 
-    def __init__(self, email: str, password: str) -> None:
+    def __init__(self, email: str='', password: str='') -> None:
         self.session: aiohttp.ClientSession = aiohttp.ClientSession()
         self.logged_in: bool = False
         self.email = email
@@ -47,10 +47,10 @@ class GradescopeMesssenger:
 
         soup = BeautifulSoup(await response.text(), 'lxml')
         if soup.find('title').string == 'Log In | Gradescope':
+            self.logged_in = False
             raise Exception(
                 'Failed to log in. Please check username and password.'
             )
-            self.logged_in = False
         else:
             self.logged_in = True
 

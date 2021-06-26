@@ -1,31 +1,29 @@
 import requests
-from util import extractor
+from util.messenger import GradescopeMessenger
 import pytest
 from bs4 import BeautifulSoup
-
-base_url = 'https://www.gradescope.com'
+from util import processor
 
 @pytest.mark.dependency(name='auth_token')
 @pytest.mark.asyncio
 async def test_get_auth_token():
-    with requests.session() as session:
-        response_obj = extractor.async_get_auth_token(base_url, session)
+    async with GradescopeMessenger() as messenger:
+        response_obj = messenger.get_auth_token()
         assert response_obj is not ''
 
 
 @pytest.mark.dependency(depends=['auth_token'])
 @pytest.mark.asyncio
 async def test_get_login_soup():
-    bad_login_json = {"username": "invalid", "password": "wrong"}
-    with requests.session() as session:
+    async with GradescopeMessenger('invalid-address@email.com', 'badPassword') as messenger:
         with pytest.raises(Exception):
-            await extractor.async_get_login_soup(session, bad_login_json)
+            await messenger.login()
 
 
 def test_extract_courses():
     with open('tests/courses_dashboard.html', 'r') as courses_html:
         soup = BeautifulSoup(courses_html, 'lxml')
-        assert extractor.extract_courses(soup)
+        assert processor.extract_courses(soup)
 
 
 def test_extract_submitted_assignment():
@@ -52,7 +50,7 @@ def test_extract_submitted_assignment():
     </tr>
     """
     row_input_soup = BeautifulSoup(row_input_html, 'lxml')
-    extracted_assignment = extractor.extract_assignment_from_row(
+    extracted_assignment = processor.extract_assignment_from_row(
         row_input_soup, 'Example', 2021
     )
     assert extracted_assignment.name == 'Final Exam'
@@ -86,7 +84,7 @@ def test_extract_unsubmitted_assignment():
     </tr>
     """
     row_input_soup = BeautifulSoup(row_input_html, 'lxml')
-    extracted_assignment = extractor.extract_assignment_from_row(
+    extracted_assignment = processor.extract_assignment_from_row(
         row_input_soup, 'Example', 2021
     )
     assert extracted_assignment.name == 'Incomplete Assignment'
@@ -120,7 +118,7 @@ def test_extract_scored_assignment():
     </tr>
     """
     row_input_soup = BeautifulSoup(row_input_html, 'lxml')
-    extracted_assignment = extractor.extract_assignment_from_row(
+    extracted_assignment = processor.extract_assignment_from_row(
         row_input_soup, 'Example', 2021
     )
     assert extracted_assignment.name == 'Scored Exam Example'
@@ -157,7 +155,7 @@ def test_extract_assignment_with_late_due_date():
     </tr>
     """
     row_input_soup = BeautifulSoup(row_input_html, 'lxml')
-    extracted_assignment = extractor.extract_assignment_from_row(
+    extracted_assignment = processor.extract_assignment_from_row(
         row_input_soup, 'Example', 2021
     )
     assert extracted_assignment.name == 'Assignment with Late Due Date'

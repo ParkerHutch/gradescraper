@@ -8,19 +8,8 @@ import platform
 from asyncio.proactor_events import _ProactorBasePipeTransport
 from functools import wraps
 
-from util.messenger import GradescopeMesssenger
+from util.messenger import GradescopeMessenger
 
-"""
-        TODO
-            - Loading circle
-            - Timeout
-            - async_get_auth_token takes most of the program time, see if there's a way to speed it up
-            - Add something to documentation about how cchardet supposedly speeds up encoding
-            - Make a requirements.txt
-            - More error handling
-            - YAML for user info
-            - Organized file structure
-"""
 
 def get_parser() -> argparse.ArgumentParser:
     """Build an ArgumentParser to handle various command line arguments.
@@ -87,11 +76,11 @@ async def main():
             account_dict = {"email": account_email, "password": password}
             json.dump(account_dict, account_file, ensure_ascii=False, indent=4)
 
-    async with GradescopeMesssenger(account_email, password) as messenger:
+    async with GradescopeMessenger(account_email, password) as messenger:
         courses = await messenger.get_courses_and_assignments()
-    
+
     # TODO should actually be datetime.now() in prod
-    today = datetime.datetime(2021, 4, 10)  
+    today = datetime.datetime(2021, 4, 10)
 
     upcoming_assignments = [
         assignment
