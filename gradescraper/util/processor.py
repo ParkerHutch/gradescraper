@@ -8,10 +8,23 @@ from gradescraper.structures.assignment import Assignment
 from gradescraper.structures.course import Course
 from gradescraper.structures.term import Term
 
-def extract_courses(dashboard_page_soup: BeautifulSoup):
+def extract_course(course_dashboard: BeautifulSoup, term: Term):
+    course_num = int(course_dashboard.get('href').replace('/courses/', ''))
+    name = course_dashboard.find('h4', {'class': 'courseBox--name'}).string
+    short_name = course_dashboard.find(
+        'h3', {'class': 'courseBox--shortname'}
+    ).string
+    total_assignments = int(
+        course_dashboard.find(
+            'div', {'class': 'courseBox--assignments'}
+        ).string.split(' ')[0]
+    )
+    return Course(term, course_num, short_name, name, total_assignments)
+
+def extract_courses(courses_dashboard: BeautifulSoup):
     courses: List[Course] = []
     course_list_div_children: List[BeautifulSoup] = list(
-        dashboard_page_soup.find('div', {'class': 'courseList'}).children
+        courses_dashboard.find('div', {'class': 'courseList'}).children
     )
     for i in [
         x for x in range(len(course_list_div_children) - 1) if x % 2 == 0
@@ -20,19 +33,7 @@ def extract_courses(dashboard_page_soup: BeautifulSoup):
         term = Term(term_season, int(term_year))
         term_courses_div = course_list_div_children[i + 1]
         for tag in term_courses_div.find_all('a', class_='courseBox'):
-            course_num = tag.get('href').replace('/courses/', '')
-            name = tag.find('h4', {'class': 'courseBox--name'}).string
-            short_name = tag.find(
-                'h3', {'class': 'courseBox--shortname'}
-            ).string
-            total_assignments = int(
-                tag.find(
-                    'div', {'class': 'courseBox--assignments'}
-                ).string.split(' ')[0]
-            )
-            courses.append(
-                Course(term, course_num, short_name, name, total_assignments)
-            )
+            courses.append(extract_course(tag, term))
 
     return courses
 

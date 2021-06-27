@@ -12,7 +12,7 @@ class Course:
     def __init__(
         self,
         term: Term,
-        course_num: int,
+        course_num: int, # TODO rename to num
         short_name: str,
         name: str,
         assignments_num: int,
@@ -70,8 +70,8 @@ class Course:
         assignments_to_return = []
         for assignment in self.assignments:
             if (
-                assignment.due_date > start_date
-                and assignment.due_date < end_date
+                assignment.due_date >= start_date
+                and assignment.due_date <= end_date
             ):
                 if unsubmitted_only:
                     if not assignment.submitted:

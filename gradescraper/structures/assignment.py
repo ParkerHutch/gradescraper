@@ -1,15 +1,6 @@
 class Assignment:
-    def __init__(self, name, course_name, submitted):
-        self.name = name
-        self.course_name = course_name
-        self.submitted = submitted
-        self.url = ""
-        self.release_date = None
-        self.due_date = None
-        self.late_due_date = None
-
     def __init__(
-        self, name, course_name, url, submitted, release_date, due_date, late_due_date
+        self, name, course_name, url, submitted, release_date = None, due_date = None, late_due_date = None
     ):
         self.name = name
         self.course_name = course_name
