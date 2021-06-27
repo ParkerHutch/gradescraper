@@ -8,20 +8,42 @@ from gradescraper.structures.assignment import Assignment
 from gradescraper.structures.course import Course
 from gradescraper.structures.term import Term
 
-def extract_course(course_dashboard: BeautifulSoup, term: Term):
-    course_num = int(course_dashboard.get('href').replace('/courses/', ''))
-    name = course_dashboard.find('h4', {'class': 'courseBox--name'}).string
-    short_name = course_dashboard.find(
+
+def extract_course(course_entry: BeautifulSoup, term: Term) -> Course:
+    """Extract a course from its HTML entry in the courses overview.
+
+    Args:
+        course_entry (BeautifulSoup): the course's HTML entry in the
+        overall course dashboard.
+        term (Term): the term during which the course takes place.
+
+    Returns:
+        Course: A course containing the information parsed from course_entry.
+    """
+    course_num = int(course_entry.get('href').replace('/courses/', ''))
+    name = course_entry.find('h4', {'class': 'courseBox--name'}).string
+    short_name = course_entry.find(
         'h3', {'class': 'courseBox--shortname'}
     ).string
     total_assignments = int(
-        course_dashboard.find(
+        course_entry.find(
             'div', {'class': 'courseBox--assignments'}
         ).string.split(' ')[0]
     )
     return Course(term, course_num, short_name, name, total_assignments)
 
-def extract_courses(courses_dashboard: BeautifulSoup):
+
+def extract_courses(courses_dashboard: BeautifulSoup) -> List[Course]:
+    """Extract every course from the dashboard of courses.
+
+    Args:
+        courses_dashboard (BeautifulSoup): The courses dashboard, which should
+        contain a div with class 'courseList' containing an entry for each of
+        the user's courses.
+
+    Returns:
+        List[Course]: A list of Courses parsed from the dashboard given.
+    """
     courses: List[Course] = []
     course_list_div_children: List[BeautifulSoup] = list(
         courses_dashboard.find('div', {'class': 'courseList'}).children
@@ -40,7 +62,20 @@ def extract_courses(courses_dashboard: BeautifulSoup):
 
 def extract_assignment_from_row(
     row: BeautifulSoup, course_name: str, assignment_year: str
-):
+) -> Assignment:
+    """Extract an Assignment from the row given.
+
+    Args:
+        row (BeautifulSoup): An HTML 'tr' element containing information about
+        an Assignment.
+        course_name (str): The name of the course that this assignment belongs
+        to. Required because the assignment row typically contains due dates
+        without a listed year.
+        assignment_year (str): The year that the assignment was assigned.
+
+    Returns:
+        Assignment: an assignment parsed from the row HTML given.
+    """
     submitted = not row.find(
         'td', {'class': 'submissionStatus submissionStatus-warning'}
     )
@@ -60,9 +95,11 @@ def extract_assignment_from_row(
         else ''
     )
 
-    release_date: str = row.find(
+    
+    release_date = datetime.strptime(row.find(
         'span', {'class': 'submissionTimeChart--releaseDate'}
-    ).string
+    ).string, '%b %d').replace(year=int(assignment_year)) 
+    # TODO get rid of int(assignment_year), just pass the int year
 
     due_dates = [
         datetime.strptime(
@@ -85,8 +122,16 @@ def extract_assignment_from_row(
     )
 
 
-# Returns a list of the courses from the most recent year and season
 def strip_old_courses(courses_list: List[Course]) -> List[Course]:
+    """Return the courses in courses_list that occurred in the most recent term.
+
+    Args:
+        courses_list (List[Course]): A list of courses from various terms.
+
+    Returns:
+        List[Course]: courses in courses_list that took place in the most recent
+        term.
+    """
     most_recent_term = min(courses_list, key=attrgetter('term')).term
     return [
         course for course in courses_list if course.term == most_recent_term

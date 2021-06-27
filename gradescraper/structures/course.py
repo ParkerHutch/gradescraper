@@ -5,8 +5,17 @@ from gradescraper.structures.assignment import Assignment
 from gradescraper.structures.term import Term
 
 class Course:
-    """A class for storing a Course's identifying information and its
-    assignments. Utilities for retrieving assignments are also included.
+    """A class for storing a Course's identifying information and assignments.
+    
+    Utilities for retrieving assignments are also included.
+
+    Attributes:
+        term (Term): the school term that the Course takes place during.
+        course_num (int): the course's number on the Gradescope system.
+        short_name (str): the course's short name in the Gradescope system.
+        name (str): The course's full name.
+        assignments_num (int): the number of assignments in the Course at the 
+        time it was parsed.
     """
 
     def __init__(
@@ -24,15 +33,15 @@ class Course:
         number of assignments.
 
         Args:
-            term (Term): the school term that the Course takes place during
-            course_num (int): the course's number on the Gradescope system
-            short_name (str): the course's short name in the Gradescope system
-            name (str): The course's full name
-            assignments_num (int): the number of assignments in the Course
-            at the time of retrieval
+            term (Term): the school term that the Course takes place during.
+            course_num (int): the course's number on the Gradescope system.
+            short_name (str): the course's short name in the Gradescope system.
+            name (str): The course's full name.
+            assignments_num (int): the number of assignments in the Course at 
+            the time of retrieval.
         """
         self.term = term
-        self.course_num = course_num
+        self.number = course_num
         self.short_name = short_name
         self.name = name
         self.assignments_num = assignments_num
@@ -55,14 +64,14 @@ class Course:
 
         Args:
             start_date (datetime.datetime): The start date of the range to
-            search for assignments in
+            search for assignments over.
             end_date (datetime.datetime): The end date of the range to search
-            for assignments in
+            for assignments over.
             unsubmitted_only (bool, optional): Whether to only return
             unsubmitted assignments. Defaults to False.
 
         Returns:
-            List[Assignment]: The assignments contained in the specified range
+            List[Assignment]: The assignments contained in the specified range.
         """
         if start_date > end_date:
             return []
@@ -83,4 +92,4 @@ class Course:
         return assignments_to_return
 
     def __str__(self):
-        return f'{self.term}: {self.short_name} ({self.name})\t Assignments: {self.assignments_num}\t #:{self.course_num}'
+        return f'{self.term}: {self.short_name} ({self.name})\t Assignments: {self.assignments_num}\t #:{self.number}'

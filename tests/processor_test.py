@@ -6,7 +6,7 @@ def test_extract_course():
     with open('tests/course_row.html') as course_html:
         soup = BeautifulSoup(course_html, 'lxml').find('a', class_='courseBox')
     course = processor.extract_course(soup, Term('Summer', 1776))
-    assert course.course_num == 123456
+    assert course.number == 123456
     assert course.name == 'MATH 1234 / All Sections'
     assert course.assignments_num == 14
 
