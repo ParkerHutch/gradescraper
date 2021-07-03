@@ -55,7 +55,6 @@ def get_parser() -> argparse.ArgumentParser:
 
     account_info_group.add_argument(
         '-d', '--days-forward',
-        nargs=1,
         metavar='NUM',
         help='retrieve assignments up to NUM days from today',
         type=int,

@@ -14,7 +14,7 @@ A command line program that scrapes a user's courses from the Gradescope website
 ```bash
 $ python gradescraper.py
 📶 Retrieving assignents from courses...
-Upcoming assignments over the next 7 days (04/10➡ 04/17):
+Upcoming assignments over the next 7 days (04/10➡04/17):
 Course Name          Assignment        Due Date        Submitted
 Linear Algebra       📓WS 10A          📅04/10 11:59PM ✅
 Linear Algebra       📓HW 3B           📅04/14 11:59PM ✅
@@ -29,14 +29,14 @@ Biology              📓Lab 5           📅04/13 11:00PM ✅
 - Asynchronous requests
 - Command line tool
 
-# Usage
+## Usage
 
 
 ```bash
 python gradescraper.py [-h] [-v] [--store-account STORE_ACCOUNT] (-f FILE | --account USERNAME PASSWORD)
 
 ```
-# Arguments
+## Arguments
 
 |short|long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|help|
 | :--- | :--- | :--- |
@@ -48,13 +48,13 @@ python gradescraper.py [-h] [-v] [--store-account STORE_ACCOUNT] (-f FILE | --ac
 
 ## Running Tests
 
-Tests are stored in the tests directory. To run them, run the following command from the root folder of the project:
+Tests are stored in the [tests](tests) directory. To run them, run the following command from the root folder of the project:
 
 ```bash
 python -m pytest tests
 ```
 
-## Optimizations
+### Optimizations
 
 Asynchronous requests were utilized to retrieve the information for multiple courses at once.
 
