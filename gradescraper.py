@@ -89,18 +89,15 @@ async def main():
 
     # TODO should actually be datetime.now() in prod
     today = datetime.datetime(2021, 4, 10)
-
+    end_date = today + datetime.timedelta(days=args.days_forward)
     upcoming_assignments = [
         assignment
         for course in courses
-        for assignment in course.get_assignments_in_range(
-            today, today + datetime.timedelta(days=args.days_forward)
-        )
+        for assignment in course.get_assignments_in_range(today, end_date)
     ]
 
-    print(f'Upcoming assignments over the next {args.days_forward} days:')
+    print(f'Upcoming assignments over the next {args.days_forward} days ({today:%m/%d}\U000027A1 {end_date:%m/%d}):')
     for assignment in upcoming_assignments:
-        #print(f'{assignment.course_name:<8} {assignment.name:<15} {assignment.due_date:<10} {assignment.submitted:<10}')
         print(assignment)
 
 

@@ -51,4 +51,3 @@ class Assignment:
     def __str__(self):
         submission_emoji = '\U00002705' if self.submitted else '\U0000274C'
         return f'{self.course_name[:18]:<20} \U0001F4D3{self.name: <15} \U0001F4C5{self.due_date:%m/%d %I:%M%p} {submission_emoji}'
-        #return f'\U0001F4D3[{self.course_name}] {self.name} \U0001F4C5Due {self.due_date:%m/%d/%y %I:%M%p} Submitted: {submission_emoji}'
