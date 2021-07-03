@@ -28,20 +28,21 @@ def get_parser() -> argparse.ArgumentParser:
         action='store_true',
     )
     parser.add_argument(
-        '--store-account',
-        help='store username and password in the given filename for later use',
-        type=str,
-        default='',
+        '--remember-me',
+        help='store username and password in ./data.json for later use',
+        action='store_const',
+        const='data.json',
+        default=False
     )
 
-    account_info_group = parser.add_mutually_exclusive_group(required=True)
+    account_info_group = parser.add_mutually_exclusive_group(required=False)
     account_info_group.add_argument(
         '-f',
         '--file',
         metavar='FILE',
-        help='use file for account information',
+        help='use the given file for account information',
         type=str,
-        default='',
+        default='data.json',
     )
     account_info_group.add_argument(
         '--account',
@@ -52,30 +53,37 @@ def get_parser() -> argparse.ArgumentParser:
         default='',
     )
 
+    account_info_group.add_argument(
+        '-d', '--days-forward',
+        nargs=1,
+        metavar='NUM',
+        help='retrieve assignments up to NUM days from today',
+        type=int,
+        default=7,
+    )
+
     return parser
 
-
 async def main():
-    print('\U0001F4F6 Extracting courses and assignments...')
-    args = get_parser().parse_args()  # TODO make sure this works
+    args = get_parser().parse_args()
     account_email = ''
     password = ''
 
-    if args.file:
+    if args.account:
+        account_email, password = args.account
+    else:
         with open(args.file, 'r') as account_file:
             account_json = json.load(account_file)
             account_email, password = (
                 account_json['email'],
                 account_json['password'],
             )
-    else:
-        account_email, password = args.account
-
-    if args.store_account:
-        with open(args.store_account, 'w') as account_file:
+    if args.remember_me or args.file:
+        with open(args.remember_me or args.file, 'w') as account_file:
             account_dict = {"email": account_email, "password": password}
             json.dump(account_dict, account_file, ensure_ascii=False, indent=4)
 
+    print(f'\U0001F4F6 Retrieving assignents from courses...')
     async with GradescopeMessenger(account_email, password) as messenger:
         courses = await messenger.get_courses_and_assignments()
 
@@ -86,12 +94,13 @@ async def main():
         assignment
         for course in courses
         for assignment in course.get_assignments_in_range(
-            today, today + datetime.timedelta(days=7)
+            today, today + datetime.timedelta(days=args.days_forward)
         )
     ]
 
-    print('Upcoming assignments:')
+    print(f'Upcoming assignments over the next {args.days_forward} days:')
     for assignment in upcoming_assignments:
+        #print(f'{assignment.course_name:<8} {assignment.name:<15} {assignment.due_date:<10} {assignment.submitted:<10}')
         print(assignment)
 
 
