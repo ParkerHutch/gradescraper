@@ -1,5 +1,5 @@
 
-![Logo](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/th5xamgrr6se0x5ro4g6.png)
+![Logo](img/logo.png)
 
 
 ![quality_badge](https://img.shields.io/lgtm/grade/python/github/ParkerHutch/gradescraper)
@@ -20,12 +20,12 @@ A command line program that scrapes a user's courses from the Gradescope website
 
 
 ```bash
-python main.py [-h] [-v] [--store-account STORE_ACCOUNT] (-f FILE | --account USERNAME PASSWORD)
+python gradescraper.py [-h] [-v] [--store-account STORE_ACCOUNT] (-f FILE | --account USERNAME PASSWORD)
 
 ```
 # Arguments
 
-|short|long|help|
+|short|long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|help|
 | :--- | :--- | :--- |
 |`-h`|`--help`|show this help message and exit|
 |`-v`|`--verbose`|show output when running the program|
