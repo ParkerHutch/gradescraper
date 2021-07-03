@@ -25,7 +25,7 @@ python gradescraper.py [-h] [-v] [--store-account STORE_ACCOUNT] (-f FILE | --ac
 ```
 # Arguments
 
-|short|long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|help|
+|short|long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|help|
 | :--- | :--- | :--- |
 |`-h`|`--help`|show this help message and exit|
 |`-v`|`--verbose`|show output when running the program|
