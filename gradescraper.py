@@ -97,7 +97,10 @@ async def main():
     ]
 
     print(f'Upcoming assignments over the next {args.days_forward} days ({today:%m/%d}\U000027A1 {end_date:%m/%d}):')
+    print(f'{"Course Name":<20} {"Assignment": <15}   Due Date        Submitted')
     for assignment in upcoming_assignments:
+        
+
         print(assignment)
 
 

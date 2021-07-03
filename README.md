@@ -10,6 +10,19 @@
 
 A command line program that scrapes a user's courses from the Gradescope website and offers them a quick overview of upcoming assignments. 
 
+## Demo
+```bash
+$ python gradescraper.py
+📶 Retrieving assignents from courses...
+Upcoming assignments over the next 7 days (04/10➡ 04/17):
+Course Name          Assignment        Due Date        Submitted
+Linear Algebra       📓WS 10A          📅04/10 11:59PM ✅
+Linear Algebra       📓HW 3B           📅04/14 11:59PM ✅
+World History        📓HW 5            📅04/12 11:59PM ❌
+Calculus II          📓WS 4.5          📅04/16 11:59PM ✅
+Advanced Econ        📓Quiz 4          📅04/12 11:59PM ❌
+Biology              📓Lab 5           📅04/13 11:00PM ✅
+```
 
 ## Features
 
