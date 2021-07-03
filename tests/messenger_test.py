@@ -5,7 +5,7 @@ import pytest
 @pytest.mark.asyncio
 async def test_get_auth_token():
     async with GradescopeMessenger() as messenger:
-        response_obj = messenger.get_auth_token()
+        response_obj = await messenger.get_auth_token()
         assert response_obj is not ''
 
 
