@@ -2,3 +2,4 @@
 *.tests -linguist.detectable
 tests -linguist.detectable
 tests/* -linguist.detectable
+tests/ -linguist.detectable
