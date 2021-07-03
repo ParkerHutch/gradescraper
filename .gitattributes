@@ -2,4 +2,6 @@
 *.tests -linguist.detectable
 tests -linguist.detectable
 tests/* -linguist.detectable
-tests/ -linguist.detectable
+tests/ linguist-vendored=true
+*.html linguist-vendored=true
+tests/*.html linguist-vendored=true
