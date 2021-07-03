@@ -2,7 +2,8 @@
 ![Logo](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/th5xamgrr6se0x5ro4g6.png)
 
 
-![badge](https://img.shields.io/lgtm/grade/python/github/ParkerHutch/gradescraper)
+![quality_badge](https://img.shields.io/lgtm/grade/python/github/ParkerHutch/gradescraper)
+![workflow_badge](https://github.com/ParkerHutch/gradescraper/actions/workflows/python_test.yml/badge.svg)
 ![loc_badge](https://img.shields.io/tokei/lines/github/ParkerHutch/gradescraper)
 ![repo_size_badge](https://img.shields.io/github/repo-size/ParkerHutch/gradescraper?label=size)
 # Gradescraper
