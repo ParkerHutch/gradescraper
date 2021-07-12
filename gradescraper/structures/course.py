@@ -1,5 +1,6 @@
 import datetime
 from typing import List
+from collections import namedtuple
 
 from gradescraper.structures.assignment import Assignment
 from gradescraper.structures.term import Term
@@ -47,7 +48,10 @@ class Course:
         self.assignments_num = assignments_num
         self.assignments = []
         return None
-
+    
+    def __repr__(self) -> str:
+        return str(namedtuple('Course', ['name', 'number'])(self.name, self.number))
+    
     def get_assignments_in_range(
         self,
         start_date: datetime.datetime,

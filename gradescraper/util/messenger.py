@@ -122,7 +122,7 @@ class GradescopeMessenger:
         ).find_all('tr')[1:]
         course.assignments = [
             processor.extract_assignment_from_row(
-                row, course.name, course.term.year
+                row, course_name=course.name, assignment_year=course.term.year
             )
             for row in assignments_soup
         ]
