@@ -7,7 +7,6 @@ from bs4 import BeautifulSoup, SoupStrainer
 from gradescraper.util import processor
 from gradescraper.structures.course import Course
 
-
 class GradescopeMessenger:
     """A class for handling requests to the Gradescope website.
 
@@ -49,11 +48,11 @@ class GradescopeMessenger:
         response = await self.session.get(self.base_url)
         response_text = await response.text()
         parsed_init_resp = BeautifulSoup(
-            response_text, 'lxml', parse_only=SoupStrainer("input")
+            response_text, 'lxml', parse_only=SoupStrainer('input')
         )
         return (
             parsed_init_resp.find('input', {'name': 'authenticity_token'})
-        ).get("value")
+        ).get('value')
 
     async def login(self) -> BeautifulSoup:
         """Attempt to login to the Gradescope website.

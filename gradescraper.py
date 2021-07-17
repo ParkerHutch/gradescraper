@@ -1,5 +1,3 @@
-# Gradescope API Info: https://courses.csail.mit.edu/6.857/2016/files/20.pdf
-
 import argparse
 import asyncio
 import datetime
