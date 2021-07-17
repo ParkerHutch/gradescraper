@@ -1,10 +1,11 @@
 import argparse
 import asyncio
 import datetime
-import json
 import platform
 from asyncio.proactor_events import _ProactorBasePipeTransport
 from functools import wraps
+
+import keyring
 
 from gradescraper.util.messenger import GradescopeMessenger
 
@@ -27,10 +28,15 @@ def get_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         '--remember-me',
-        help='store username and password in ./data.json for later use',
+        help='store username and password for later use',
         action='store_const',
         const='data.json',
         default=False
+    )
+    parser.add_argument(
+        '--forget-me',
+        help='delete stored username and password and exit',
+        action='store_true',
     )
 
     account_info_group = parser.add_mutually_exclusive_group(required=False)
@@ -51,7 +57,7 @@ def get_parser() -> argparse.ArgumentParser:
         default='',
     )
 
-    account_info_group.add_argument(
+    parser.add_argument(
         '-d', '--days-forward',
         metavar='NUM',
         help='retrieve assignments up to NUM days from today',
@@ -63,23 +69,32 @@ def get_parser() -> argparse.ArgumentParser:
 
 async def main():
     args = get_parser().parse_args()
-    account_email = ''
-    password = ''
+    
+    service_id = 'Gradescraper'
+
+    if args.forget_me:
+        account_email = keyring.get_password(service_id, 'STORED_EMAIL')
+        if not account_email:
+            print('No stored account info was found')
+        else:
+            keyring.delete_password(service_id, account_email)
+            keyring.delete_password(service_id, 'STORED_EMAIL')
+            print(f'Removed account information for {account_email}')
+
+        return None
 
     if args.account:
         account_email, password = args.account
+        if args.remember_me:
+            keyring.set_password(service_id, account_email, password)
+            keyring.set_password(service_id, 'STORED_EMAIL', account_email)
     else:
-        with open(args.file, 'r') as account_file:
-            account_json = json.load(account_file)
-            account_email, password = (
-                account_json['email'],
-                account_json['password'],
-            )
-    if args.remember_me or args.file:
-        with open(args.remember_me or args.file, 'w') as account_file:
-            account_dict = {"email": account_email, "password": password}
-            json.dump(account_dict, account_file, ensure_ascii=False, indent=4)
-
+        account_email = keyring.get_password(service_id, 'STORED_EMAIL')
+        password = keyring.get_password(service_id, account_email)
+        if not (account_email and password):
+            print('No stored account info was found. Please run with --account and --remember-me to save account information.')
+            return None
+    
     print(f'\U0001F4F6 Retrieving assignents from courses...')
     async with GradescopeMessenger(account_email, password) as messenger:
         courses = await messenger.get_courses_and_assignments()
