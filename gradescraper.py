@@ -31,7 +31,7 @@ def get_parser() -> argparse.ArgumentParser:
         help='store username and password for later use',
         action='store_const',
         const='data.json',
-        default=False
+        default=False,
     )
     parser.add_argument(
         '--forget-me',
@@ -58,7 +58,8 @@ def get_parser() -> argparse.ArgumentParser:
     )
 
     parser.add_argument(
-        '-d', '--days-forward',
+        '-d',
+        '--days-forward',
         metavar='NUM',
         help='retrieve assignments up to NUM days from today',
         type=int,
@@ -67,9 +68,10 @@ def get_parser() -> argparse.ArgumentParser:
 
     return parser
 
+
 async def main():
     args = get_parser().parse_args()
-    
+
     service_id = 'Gradescraper'
 
     if args.forget_me:
@@ -92,9 +94,11 @@ async def main():
         account_email = keyring.get_password(service_id, 'STORED_EMAIL')
         password = keyring.get_password(service_id, account_email)
         if not (account_email and password):
-            print('No stored account info was found. Please run with --account and --remember-me to save account information.')
+            print(
+                'No stored account info was found. Please run with --account and --remember-me to save account information.'
+            )
             return None
-    
+
     print(f'\U0001F4F6 Retrieving assignents from courses...')
     async with GradescopeMessenger(account_email, password) as messenger:
         courses = await messenger.get_courses_and_assignments()
@@ -108,8 +112,12 @@ async def main():
         for assignment in course.get_assignments_in_range(today, end_date)
     ]
 
-    print(f'Upcoming assignments over the next {args.days_forward} days ({today:%m/%d}\U000027A1 {end_date:%m/%d}):')
-    print(f'{"Course Name":<20} {"Assignment": <15}   Due Date        Submitted')
+    print(
+        f'Upcoming assignments over the next {args.days_forward} days ({today:%m/%d}\U000027A1 {end_date:%m/%d}):'
+    )
+    print(
+        f'{"Course Name":<20} {"Assignment": <15}   Due Date        Submitted'
+    )
     for assignment in upcoming_assignments:
         print(assignment)
 
