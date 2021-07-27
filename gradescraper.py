@@ -81,7 +81,7 @@ async def main():
         else:
             keyring.delete_password(service_id, account_email)
             keyring.delete_password(service_id, 'STORED_EMAIL')
-            print(f'Removed account information for {account_email}')
+            print(f'Removed account information.')
 
         return None
 
